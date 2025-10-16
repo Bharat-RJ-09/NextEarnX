@@ -102,7 +102,7 @@ a { text-decoration: none; color: inherit; }
 /* Base Glass Card Style */
 .card {
   padding: 20px;
-  border-radius: 18px;
+  border-radius: 10px;
   background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
   backdrop-filter: blur(12px) saturate(1.1);
   border: 1px solid rgba(255,255,255,0.15);
@@ -160,7 +160,7 @@ a { text-decoration: none; color: inherit; }
 
 /* Balance Card (Right) */
 .balance-card-new {
-    border: 1px solid #00e0ff;
+    /* border: 1px solid #00e0ff; */
     box-shadow: 0 0 20px rgba(0,224,255,0.3);
 }
 .balance-card-new .card-header h3 {
