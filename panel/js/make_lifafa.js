@@ -44,19 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
         logArea.prepend(p);
     }
     
-    // NEW UTILITY: Parse and Filter Numbers
+    // NEW UTILITY: Parse and Filter Numbers (FIXED)
     function parseAndFilterNumbers(rawText) {
         if (!rawText) return [];
         
-        // Split by comma, asterisk, period, space, or newline, and filter out empty strings
+        // 1. Split by all recognized separators (comma, asterisk, period, space, or newline)
         const potentialNumbers = rawText.split(/[,*.\s\n]+/).filter(Boolean);
         
-        // Filter for valid 10-digit numeric strings
+        // 2. Filter for valid 10-digit numeric strings (CRITICAL: /^\d{10}$/ regex ensures 10 digits only)
         const validNumbers = potentialNumbers.filter(n => 
             /^\d{10}$/.test(n.trim())
         );
         
-        // Return only unique, valid 10-digit numbers
+        // 3. Return only unique numbers using a Set, and convert back to an Array.
         return Array.from(new Set(validNumbers));
     }
     
@@ -202,13 +202,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Mock Check Button Listener (Special Users)
+    // Mock Check Button Listener (Special Users) - FIXED
     document.querySelector('#specialUsersContent .check-btn')?.addEventListener('click', () => {
-        const users = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
-        if (users) {
-            alert(`MOCK: Checking ${users.split(/[,*.\s\n]+/).filter(Boolean).length} numbers. Validation is pending.`);
+        const rawUsers = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
+        const textarea = document.getElementById('lifafaSpecialUsers_Normal');
+
+        if (!rawUsers) {
+             alert('Enter mobile numbers first!');
+             return;
+        }
+        
+        // 1. Calculate total original entries (including duplicates and invalid)
+        const totalOriginalEntries = rawUsers.split(/[,*.\s\n]+/).filter(Boolean).length;
+        
+        // 2. Get the final cleaned list (unique and 10-digit only)
+        const validNumbers = parseAndFilterNumbers(rawUsers);
+        
+        const finalCount = validNumbers.length;
+        const removedCount = totalOriginalEntries - finalCount;
+        
+        // 3. Update textarea with only valid, unique numbers (separated by newline for readability)
+        textarea.value = validNumbers.join('\n');
+        
+        if (finalCount === 0) {
+            alert("❌ No valid 10-digit unique numbers found after filtering.");
+            appendLog('Error: No valid 10-digit numbers found.', 'error');
         } else {
-            alert('Enter mobile numbers first!');
+             alert(`✅ Filtered and kept ${finalCount} valid 10-digit numbers. Removed ${removedCount} invalid entries/duplicates.`);
+             appendLog(`Filtered: ${finalCount} valid numbers found for Special Users. Removed: ${removedCount}.`, 'success');
         }
     });
 
@@ -228,10 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ------------------------------------------
-    // --- LIFAFA CREATION LOGIC (NORMAL) ---
-    // ------------------------------------------
-
-   // --- LIFAFA CREATION LOGIC (ALL TYPES) ---
+     
+ // --- LIFAFA CREATION LOGIC (ALL TYPES) ---
 // ------------------------------------------
 
 document.querySelectorAll('.lifafa-form-new').forEach(form => {
@@ -256,92 +275,6 @@ document.querySelectorAll('.lifafa-form-new').forEach(form => {
         const youtubeLink = document.getElementById('lifafaYoutubeLink_Normal')?.value.trim();
         const referCount = parseInt(document.getElementById('lifafaReferCount_Normal')?.value) || 0;
         const requiredChannels = globalSettings.telegramChannels || [];
-
-        // TYPE-SPECIFIC FIELDS
-        let typeSpecificData = {};
-        if (lifafaType === 'Scratch') {
-            const luckPercentage = parseInt(document.getElementById('percentageSlider_Scratch').value) || 100;
-            typeSpecificData.luckPercentage = luckPercentage;
-        }
-
-        const totalAmount = perUserAmount * count; 
-        const currentBalance = getBalance(senderUsername);
-
-        // 1. Validation
-        if (!title) { appendLog('Error: Lifafa Title is required.', 'error'); return; }
-        if (isNaN(perUserAmount) || perUserAmount < 0.01) {
-            appendLog(`Error: Per user amount must be at least ₹0.01.`, 'error');
-            return;
-        }
-        if (isNaN(count) || count < 2) {
-            appendLog('Error: Minimum claims/users is 2.', 'error');
-            return;
-        }
-        if (totalAmount < MIN_LIFAFA_AMOUNT) {
-             appendLog(`Error: Minimum Lifafa total amount is ₹${MIN_LIFAFA_AMOUNT}.`, 'error');
-             return;
-        }
-        if (currentBalance < totalAmount) {
-            appendLog(`Error: Insufficient balance. Available: ₹${currentBalance.toFixed(2)}. Total Cost: ₹${totalAmount.toFixed(2)}`, 'error');
-            return;
-        }
-
-        // 2. Confirmation
-        if (!confirm(`Confirm creation of ${lifafaType} Lifafa worth ₹${totalAmount.toFixed(2)} for ${count} users?`)) {
-            return;
-        }
-
-        // 3. Execution: Deduct and Create Lifafa Object
-        const newBalance = currentBalance - totalAmount;
-        setBalance(senderUsername, newBalance);
-
-        const uniqueId = senderUsername.slice(0, 3).toUpperCase() + Math.random().toString(36).substring(2, 9).toUpperCase() + Date.now().toString().slice(-4);
-        
-        const newLifafa = {
-            id: uniqueId,
-            creator: senderUsername,
-            date: Date.now(),
-            type: lifafaType, 
-            title: title,
-            comment: comment,
-            redirectLink: redirectLink,
-            accessCode: accessCode || null,
-            specialUsers: specialUsers, // Use the cleaned array
-            requirements: {
-                channels: requiredChannels,
-                youtube: youtubeLink || null,
-                referrals: referCount > 0 ? referCount : null,
-            },
-            ...typeSpecificData,
-            totalAmount: totalAmount, 
-            count: count,
-            perClaim: perUserAmount, 
-            claims: [] 
-        };
-
-        // 4. Save Lifafa & Log Transaction
-        let lifafas = loadLifafas();
-        lifafas.push(newLifafa);
-        saveLifafas(lifafas);
-        
-        let senderHistory = getHistory(senderUsername);
-        senderHistory.push({ date: Date.now(), type: 'debit', amount: totalAmount, txnId: `LIFAFA_CREATED_${lifafaType}_` + uniqueId, note: `Created ${lifafaType} Lifafa: ${title}` });
-        saveHistory(senderUsername, senderHistory);
-
-
-        // 5. Final UI Update
-        refreshBalanceUI();
-        renderLifafas();
-        appendLog(`SUCCESS: ${lifafaType} Lifafa created! Share link with ID: ${uniqueId}`, 'success');
-        
-        const linkMsg = document.createElement('p');
-        linkMsg.innerHTML = `<span style="color: #00e0ff; font-weight:bold;">Link:</span> ${window.location.origin}/claim.html?id=${uniqueId}`;
-        logArea.prepend(linkMsg);
-        
-        form.reset(); 
-    });
-});
-
     // Logout Button (For consistency)
     if(logoutBtn) {
         logoutBtn.addEventListener('click', () => {
