@@ -1,8 +1,9 @@
-// panel/js/make_lifafa.js - Dedicated Lifafa Creation Logic (REFINED AND FRESH)
+// panel/js/make_lifafa.js - Dedicated Lifafa Creation Logic (FINAL REFINED VERSION WITH DRAFTS)
 
 document.addEventListener('DOMContentLoaded', () => {
     
     const SETTINGS_KEY = 'nextEarnXGlobalSettings';
+    const DRAFT_KEY = 'nextEarnXLifafaDrafts'; // NEW DRAFT KEY
     
     // UI Elements
     const currentBalanceDisplay = document.getElementById('currentBalanceDisplay'); 
@@ -29,6 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // SCRATCH SLIDER ELEMENT
     const scratchSlider = document.getElementById('percentageSlider_Scratch');
     const sliderValueDisplay = document.getElementById('sliderValue_Scratch');
+    
+    // NEW DRAFT MODAL ELEMENTS
+    const draftModal = document.getElementById('draftModal');
+    const openDraftModalBtn = document.getElementById('openDraftModalBtn');
+    const closeDraftModalBtn = document.getElementById('closeDraftModalBtn');
+    const draftCountDisplay = document.getElementById('draftCount');
+    const draftListContainer = document.getElementById('draftListContainer');
+    const clearAllDraftsBtn = document.getElementById('clearAllDraftsBtn');
 
 
     // LIFAFA LIMITS
@@ -41,9 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let senderUsername = '';
     let globalSettings = {}; 
-    let videoDurationSeconds = 0; // Stores the mock duration in seconds
+    let videoDurationSeconds = 0; 
+    let currentLifafaType = 'Normal'; // Track current active tab
 
-    // --- UTILITIES ---
+    // --- UTILITIES (REFINED) ---
     
     function getCurrentUserSession() {
         try {
@@ -127,15 +137,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function parseAndFilterNumbers(rawText) {
         if (!rawText) return [];
         
-        // Split by all recognized separators (comma, asterisk, period, space, or newline)
         const potentialNumbers = rawText.split(/[,*.\s\n]+/).filter(Boolean);
         
-        // Filter for valid 10-digit numeric strings
         const validNumbers = potentialNumbers.filter(n => 
             /^\d{10}$/.test(n.trim())
         );
         
-        // Return only unique numbers using a Set, and convert back to an Array.
         return Array.from(new Set(validNumbers));
     }
 
@@ -163,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function fetchYoutubeInfo(videoId) {
         if (!videoId) return null;
 
-        // Mock duration in seconds (4 minutes (240s) to 15 minutes (900s))
         const mockDuration = Math.floor(Math.random() * (900 - 240 + 1)) + 240; 
         
         return {
@@ -173,7 +179,148 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
     
-    // --- LIFAFA LIST RENDERING ---
+    // --- DRAFT UTILITIES (NEW) ---
+    
+    function loadDrafts() {
+        try {
+            const drafts = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]");
+            return drafts.filter(d => d.creator === senderUsername);
+        } catch {
+            return [];
+        }
+    }
+    
+    function saveDrafts(drafts) {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(drafts));
+        renderDraftList();
+    }
+    
+    function autoSaveLifafa() {
+        const formId = `${currentLifafaType.toLowerCase()}LifafaForm`;
+        const form = document.getElementById(formId);
+        if (!form) return;
+        
+        const timestamp = Date.now();
+        
+        // Collect all form data (simplified approach for drafts)
+        const formData = {
+            type: currentLifafaType,
+            title: document.getElementById(`lifafaTitle_${currentLifafaType}`)?.value || 'Untitled',
+            data: {}
+        };
+        
+        // Collect all input values by ID for the current form type
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+             formData.data[input.id] = input.value;
+        });
+
+        // Collect Advanced Settings (since they are common)
+        formData.data.lifafaAccessCode_Normal = document.getElementById('lifafaAccessCode_Normal')?.value || '';
+        formData.data.lifafaSpecialUsers_Normal = document.getElementById('lifafaSpecialUsers_Normal')?.value || '';
+        formData.data.lifafaYoutubeLink_Normal = document.getElementById('lifafaYoutubeLink_Normal')?.value || '';
+        formData.data.lifafaReferAmount_Normal = document.getElementById('lifafaReferAmount_Normal')?.value || '';
+        formData.data.lifafaReferComment_Normal = document.getElementById('lifafaReferComment_Normal')?.value || '';
+        formData.data.lifafaReferCount_Normal = document.getElementById('lifafaReferCount_Normal')?.value || '';
+        
+        // Unique key based on user and form type
+        const draftKey = senderUsername + '-' + currentLifafaType;
+        
+        let allDrafts = loadDrafts();
+        let otherUserDrafts = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]").filter(d => d.creator !== senderUsername);
+        
+        const existingIndex = allDrafts.findIndex(d => d.key === draftKey);
+        
+        const newDraft = {
+            key: draftKey,
+            creator: senderUsername,
+            type: currentLifafaType,
+            title: formData.title || `${currentLifafaType} Draft`,
+            date: timestamp,
+            data: formData.data
+        };
+
+        if (existingIndex !== -1) {
+            allDrafts[existingIndex] = newDraft; // Update existing
+        } else {
+            allDrafts.push(newDraft); // Add new
+        }
+        
+        // Merge back and save globally
+        localStorage.setItem(DRAFT_KEY, JSON.stringify([...otherUserDrafts, ...allDrafts]));
+        draftCountDisplay.textContent = allDrafts.length;
+    }
+    
+    function loadDraftToForm(draftData) {
+        // 1. Switch to correct form tab
+        const formType = draftData.type;
+        currentLifafaType = formType;
+        document.querySelectorAll('.lifafa-tab-secondary').forEach(b => {
+             b.classList.remove('active');
+             if (b.dataset.lifafaType === formType) b.classList.add('active');
+        });
+        document.querySelectorAll('.lifafa-form-new').forEach(f => {
+            f.style.display = (f.dataset.type === formType) ? 'block' : 'none';
+        });
+        
+        // 2. Fill inputs
+        for (const id in draftData.data) {
+            const input = document.getElementById(id);
+            if (input) input.value = draftData.data[id];
+        }
+        
+        // 3. Close Modal and Log
+        draftModal.style.display = 'none';
+        // Hide YouTube info container unless Check is run again
+        if (youtubeVideoInfoContainer) youtubeVideoInfoContainer.style.display = 'none'; 
+        appendLog(`Draft for ${draftData.title} (${formType}) loaded.`, 'info');
+    }
+
+    function renderDraftList() {
+        const drafts = loadDrafts();
+        draftCountDisplay.textContent = drafts.length;
+        draftListContainer.innerHTML = '';
+
+        if (drafts.length === 0) {
+            draftListContainer.innerHTML = '<p style="color:#aaa;">No saved drafts found.</p>';
+            return;
+        }
+
+        drafts.forEach(draft => {
+            const item = document.createElement('div');
+            item.classList.add('draft-item');
+            
+            const timeAgo = Math.ceil((Date.now() - draft.date) / 60000); // Minutes ago
+            
+            item.innerHTML = `
+                <div class="draft-item-info" data-key="${draft.key}" title="Click to load">
+                    ${draft.title} (${draft.type}) <small style="color:#aaa; display:block;">Saved ${timeAgo} min ago</small>
+                </div>
+                <button class="draft-item-delete" data-key="${draft.key}"><i class="ri-delete-bin-line"></i></button>
+            `;
+            draftListContainer.appendChild(item);
+        });
+
+        // Attach listeners for loading and deleting single draft
+        document.querySelectorAll('.draft-item-info').forEach(info => {
+            info.addEventListener('click', (e) => {
+                const key = e.target.dataset.key || e.target.closest('.draft-item-info').dataset.key;
+                const draft = drafts.find(d => d.key === key);
+                if (draft) loadDraftToForm(draft);
+            });
+        });
+        
+        document.querySelectorAll('.draft-item-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const key = e.target.dataset.key || e.target.closest('button').dataset.key;
+                const updatedDrafts = drafts.filter(d => d.key !== key);
+                saveDrafts(updatedDrafts); // Re-save and re-render
+                appendLog(`Draft deleted.`, 'info');
+            });
+        });
+    }
+
+    // --- LIFAFA LIST RENDERING --- (Unchanged)
     function renderLifafas() {
         const lifafas = loadLifafas().filter(l => l.creator === senderUsername);
         activeLifafasList.innerHTML = '';
@@ -210,12 +357,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- INITIALIZE & TAB SWITCHING LOGIC ---
+
+    // --- INITIALIZE & EVENT LISTENERS ---
     getCurrentUserSession(); 
     loadGlobalSettings();
     refreshBalanceUI();
     renderLifafas();
     updateTelegramStatusUI();
+    renderDraftList(); // Render drafts on load
+    
+    // Auto-save interval (Every 2 seconds)
+    setInterval(autoSaveLifafa, 2000); 
 
 
     // --- ACCORDION TOGGLE LOGIC (FIXED) ---
@@ -249,6 +401,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.lifafa-tab-secondary').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const type = btn.dataset.lifafaType;
+            currentLifafaType = type; // Update current type for auto-save
+
             document.querySelectorAll('.lifafa-tab-secondary').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.lifafa-form-new').forEach(f => f.style.display = 'none');
             
@@ -256,6 +410,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`${type.toLowerCase()}LifafaForm`).style.display = 'block';
             logArea.innerHTML = `<p>Ready to create ${type} Lifafa...</p>`;
             
+            // Hide YouTube info container on tab switch
+            if (youtubeVideoInfoContainer) youtubeVideoInfoContainer.style.display = 'none'; 
+
             e.stopPropagation(); 
         });
     });
@@ -276,7 +433,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const finalCount = validNumbers.length;
         const removedCount = totalOriginalEntries - finalCount;
         
-        // Update textarea with valid, unique numbers, separated by a comma and a newline
         textarea.value = validNumbers.join(',\n'); 
         
         if (finalCount === 0) {
@@ -296,8 +452,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- YOUTUBE CHECK AND SLIDER LOGIC (FINAL) ---
-    
-    // 1. Check Video Button Handler
     if (checkYoutubeVideoBtn) {
         checkYoutubeVideoBtn.addEventListener('click', () => {
             const link = youtubeLinkInput.value.trim();
@@ -314,7 +468,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!videoInfo) return; 
 
             videoDurationSeconds = videoInfo.durationSeconds;
-            // Get total minutes, rounded down for max slider value (e.g., 5 min 59 sec = 5 min max)
             const totalMinutes = Math.floor(videoDurationSeconds / 60);
             
             if (totalMinutes < 1) {
@@ -322,27 +475,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Update UI with video details
             videoThumbnail.src = videoInfo.thumbnailUrl;
             videoThumbnail.style.display = 'block';
             videoTitleDisplay.textContent = videoInfo.title;
             videoTotalDurationDisplay.textContent = formatTime(videoDurationSeconds);
 
-            // Update Slider: Max value is total minutes (Min is always 1)
             watchDurationSlider.max = totalMinutes;
-            watchDurationSlider.value = totalMinutes; // Default to max
+            watchDurationSlider.value = totalMinutes; 
             
-            // Update Duration Displays
             watchDurationDisplay.textContent = `${totalMinutes} min`;
             
-            // Show Container
             youtubeVideoInfoContainer.style.display = 'block';
 
             appendLog(`Video data retrieved. Total length: ${formatTime(videoDurationSeconds)}.`, 'success');
         });
     }
 
-    // 2. Slider Input Handler
     if (watchDurationSlider) {
         watchDurationSlider.addEventListener('input', (e) => {
             const minutes = e.target.value;
@@ -350,154 +498,201 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- DRAFT MODAL LISTENERS (NEW) ---
+    if(openDraftModalBtn) {
+        openDraftModalBtn.addEventListener('click', () => {
+            renderDraftList();
+            draftModal.style.display = 'flex';
+        });
+    }
+    if(closeDraftModalBtn) {
+        closeDraftModalBtn.addEventListener('click', () => {
+            draftModal.style.display = 'none';
+        });
+    }
+    if(clearAllDraftsBtn) {
+        clearAllDraftsBtn.addEventListener('click', () => {
+            if (confirm("Are you sure you want to delete ALL saved drafts?")) {
+                const otherUserDrafts = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]").filter(d => d.creator !== senderUsername);
+                localStorage.setItem(DRAFT_KEY, JSON.stringify(otherUserDrafts));
+                renderDraftList();
+                appendLog('All drafts cleared.', 'info');
+            }
+        });
+    }
+    
 
-   // panel/js/make_lifafa.js: REPLACEMENT BLOCK for the LIFAFA CREATION LOGIC section (Final version with Optional Refer Reward)
+    // ------------------------------------------
+    // --- LIFAFA CREATION LOGIC (ALL TYPES) ---
+    // ------------------------------------------
 
-// ------------------------------------------
-// --- LIFAFA CREATION LOGIC (ALL TYPES) ---
-// ------------------------------------------
+    document.querySelectorAll('.lifafa-form-new').forEach(form => {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const lifafaType = form.dataset.type; 
+            
+            const perUserAmount = parseFloat(document.getElementById(`lifafaPerUserAmount_${lifafaType}`).value);
+            const count = parseInt(document.getElementById(`lifafaCount_${lifafaType}`).value);
+            const title = document.getElementById(`lifafaTitle_${lifafaType}`).value.trim();
+            const comment = document.getElementById(`paymentComment_${lifafaType}`).value.trim();
+            const redirectLink = document.getElementById(`redirectLink_${lifafaType}`).value.trim();
+            
+            // ADVANCED FIELDS 
+            const accessCode = document.getElementById('lifafaAccessCode_Normal').value.trim();
+            const rawSpecialUsers = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
+            const specialUsers = parseAndFilterNumbers(rawSpecialUsers); 
+            
+            const youtubeLink = youtubeLinkInput.value.trim();
+            
+            // WATCH DURATION (from YouTube Check)
+            let requiredWatchDuration = null;
+            if (youtubeLink) {
+                 if (youtubeVideoInfoContainer.style.display === 'none' || !watchDurationSlider.value) {
+                     alert("⚠️ Please click 'Check Video', verify the video, and set the watch duration.");
+                     return;
+                 }
+                 const requiredMinutes = parseInt(watchDurationSlider.value) || 0;
+                 requiredWatchDuration = requiredMinutes * 60;
+                 if (requiredWatchDuration === 0) {
+                     alert("⚠️ Required watch time cannot be 0 minutes. Please adjust the slider.");
+                     return;
+                 }
+            }
+            
+            // REFERRAL REWARD FIELDS
+            const referAmountInput = document.getElementById('lifafaReferAmount_Normal');
+            const referCommentInput = document.getElementById('lifafaReferComment_Normal');
+            
+            const referAmount = parseFloat(referAmountInput.value) || 0;
+            const referComment = referCommentInput.value.trim();
 
-document.querySelectorAll('.lifafa-form-new').forEach(form => {
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const lifafaType = form.dataset.type; 
-        
-        const perUserAmount = parseFloat(document.getElementById(`lifafaPerUserAmount_${lifafaType}`).value);
-        const count = parseInt(document.getElementById(`lifafaCount_${lifafaType}`).value);
-        const title = document.getElementById(`lifafaTitle_${lifafaType}`).value.trim();
-        const comment = document.getElementById(`paymentComment_${lifafaType}`).value.trim();
-        const redirectLink = document.getElementById(`redirectLink_${lifafaType}`).value.trim();
-        
-        // ADVANCED FIELDS 
-        const accessCode = document.getElementById('lifafaAccessCode_Normal').value.trim();
-        const rawSpecialUsers = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
-        const specialUsers = parseAndFilterNumbers(rawSpecialUsers); 
-        
-        const youtubeLink = youtubeLinkInput.value.trim();
-        
-        // WATCH DURATION (from YouTube Check)
-        let requiredWatchDuration = null;
-        if (youtubeLink) {
-             if (youtubeVideoInfoContainer.style.display === 'none' || !watchDurationSlider.value) {
-                 alert("⚠️ Please click 'Check Video', verify the video, and set the watch duration.");
+            if (referAmount > 0 && referAmount < 0.01) {
+                alert("⚠️ Refer Amount must be at least ₹0.01 if set.");
+                return;
+            }
+
+            const requiredChannels = globalSettings.telegramChannels || [];
+
+            // TYPE-SPECIFIC FIELDS
+            let typeSpecificData = {};
+            if (lifafaType === 'Scratch') {
+                const luckPercentage = parseInt(document.getElementById('percentageSlider_Scratch').value) || 100;
+                typeSpecificData.luckPercentage = luckPercentage;
+            } else if (lifafaType === 'Dice') {
+                const diceNumberInput = document.getElementById('lifafaDiceNumber_Dice');
+                const diceNumber = parseInt(diceNumberInput ? diceNumberInput.value : null);
+                
+                if (isNaN(diceNumber) || diceNumber < 1 || diceNumber > 6) {
+                    alert("⚠️ Dice Lifafa requires a valid Winning Dice Number between 1 and 6.");
+                    appendLog('Error: Invalid Winning Dice Number.', 'error');
+                    return;
+                }
+                typeSpecificData.winningDice = diceNumber;
+            } else if (lifafaType === 'Toss') {
+                const tossSideInput = document.getElementById('lifafaTossSide_Toss');
+                const tossSide = tossSideInput ? tossSideInput.value : '';
+                
+                if (!tossSide || (tossSide !== 'Heads' && tossSide !== 'Tails')) {
+                    alert("⚠️ Toss Lifafa requires a valid Winning Side (Heads or Tails).");
+                    appendLog('Error: Invalid Winning Toss Side.', 'error');
+                    return;
+                }
+                typeSpecificData.winningSide = tossSide;
+            }
+
+            const totalAmount = perUserAmount * count; 
+            const currentBalance = getBalance(senderUsername);
+
+            // 1. Validation (Common)
+            if (!title) { appendLog('Error: Lifafa Title is required.', 'error'); return; }
+            if (isNaN(perUserAmount) || perUserAmount < 0.01) {
+                appendLog(`Error: Per user amount must be at least ₹0.01.`, 'error');
+                return;
+            }
+            if (isNaN(count) || count < 2) {
+                appendLog('Error: Minimum claims/users is 2.', 'error');
+                return;
+            }
+            if (totalAmount < MIN_LIFAFA_AMOUNT) {
+                 appendLog(`Error: Minimum Lifafa total amount is ₹${MIN_LIFAFA_AMOUNT}.`, 'error');
                  return;
-             }
-             const requiredMinutes = parseInt(watchDurationSlider.value) || 0;
-             requiredWatchDuration = requiredMinutes * 60;
-             if (requiredWatchDuration === 0) {
-                 alert("⚠️ Required watch time cannot be 0 minutes. Please adjust the slider.");
-                 return;
-             }
-        }
-        
-        // NEW: REFERRAL REWARD FIELDS
-        const referAmountInput = document.getElementById('lifafaReferAmount_Normal');
-        const referCommentInput = document.getElementById('lifafaReferComment_Normal');
-        
-        const referAmount = parseFloat(referAmountInput.value) || 0;
-        const referComment = referCommentInput.value.trim();
+            }
+            if (currentBalance < totalAmount) {
+                appendLog(`Error: Insufficient balance. Available: ₹${currentBalance.toFixed(2)}. Total Cost: ₹${totalAmount.toFixed(2)}`, 'error');
+                return;
+            }
 
-        if (referAmount > 0 && referAmount < 0.01) {
-            alert("⚠️ Refer Amount must be at least ₹0.01 if set.");
-            return;
-        }
+            // 2. Confirmation
+            if (!confirm(`Confirm creation of ${lifafaType} Lifafa worth ₹${totalAmount.toFixed(2)} for ${count} users?`)) {
+                return;
+            }
 
-        const requiredChannels = globalSettings.telegramChannels || [];
+            // 3. Execution: Deduct and Create Lifafa Object
+            const newBalance = currentBalance - totalAmount;
+            setBalance(senderUsername, newBalance);
 
-        // TYPE-SPECIFIC FIELDS
-        let typeSpecificData = {};
-        if (lifafaType === 'Scratch') {
-            const luckPercentage = parseInt(document.getElementById('percentageSlider_Scratch').value) || 100;
-            typeSpecificData.luckPercentage = luckPercentage;
-        }
+            const uniqueId = senderUsername.slice(0, 3).toUpperCase() + Math.random().toString(36).substring(2, 9).toUpperCase() + Date.now().toString().slice(-4);
+            
+            const newLifafa = {
+                id: uniqueId,
+                creator: senderUsername,
+                date: Date.now(),
+                type: lifafaType, 
+                title: title,
+                comment: comment,
+                redirectLink: redirectLink,
+                accessCode: accessCode || null,
+                specialUsers: specialUsers,
+                requirements: {
+                    channels: requiredChannels,
+                    youtube: youtubeLink || null,
+                    watchDuration: requiredWatchDuration, 
+                },
+                referralReward: referAmount > 0 ? {
+                    amount: referAmount,
+                    comment: referComment
+                } : null,
+                ...typeSpecificData,
+                totalAmount: totalAmount, 
+                count: count,
+                perClaim: perUserAmount, 
+                claims: [] 
+            };
 
-        const totalAmount = perUserAmount * count; 
-        const currentBalance = getBalance(senderUsername);
-
-        // 1. Validation
-        if (!title) { appendLog('Error: Lifafa Title is required.', 'error'); return; }
-        if (isNaN(perUserAmount) || perUserAmount < 0.01) {
-            appendLog(`Error: Per user amount must be at least ₹0.01.`, 'error');
-            return;
-        }
-        if (isNaN(count) || count < 2) {
-            appendLog('Error: Minimum claims/users is 2.', 'error');
-            return;
-        }
-        if (totalAmount < MIN_LIFAFA_AMOUNT) {
-             appendLog(`Error: Minimum Lifafa total amount is ₹${MIN_LIFAFA_AMOUNT}.`, 'error');
-             return;
-        }
-        if (currentBalance < totalAmount) {
-            appendLog(`Error: Insufficient balance. Available: ₹${currentBalance.toFixed(2)}. Total Cost: ₹${totalAmount.toFixed(2)}`, 'error');
-            return;
-        }
-
-        // 2. Confirmation
-        if (!confirm(`Confirm creation of ${lifafaType} Lifafa worth ₹${totalAmount.toFixed(2)} for ${count} users?`)) {
-            return;
-        }
-
-        // 3. Execution: Deduct and Create Lifafa Object
-        const newBalance = currentBalance - totalAmount;
-        setBalance(senderUsername, newBalance);
-
-        const uniqueId = senderUsername.slice(0, 3).toUpperCase() + Math.random().toString(36).substring(2, 9).toUpperCase() + Date.now().toString().slice(-4);
-        
-        const newLifafa = {
-            id: uniqueId,
-            creator: senderUsername,
-            date: Date.now(),
-            type: lifafaType, 
-            title: title,
-            comment: comment,
-            redirectLink: redirectLink,
-            accessCode: accessCode || null,
-            specialUsers: specialUsers,
-            requirements: {
-                channels: requiredChannels,
-                youtube: youtubeLink || null,
-                watchDuration: requiredWatchDuration,
-            },
-            // NEW: REFERRAL REWARD OBJECT
-            referralReward: referAmount > 0 ? {
-                amount: referAmount,
-                comment: referComment
-            } : null,
-            ...typeSpecificData,
-            totalAmount: totalAmount, 
-            count: count,
-            perClaim: perUserAmount, 
-            claims: [] 
-        };
-
-        // 4. Save Lifafa & Log Transaction
-        let lifafas = loadLifafas();
-        lifafas.push(newLifafa);
-        saveLifafas(lifafas);
-        
-        let senderHistory = getHistory(senderUsername);
-        senderHistory.push({ date: Date.now(), type: 'debit', amount: totalAmount, txnId: `LIFAFA_CREATED_${lifafaType}_` + uniqueId, note: `Created ${lifafaType} Lifafa: ${title}` });
-        saveHistory(senderUsername, senderHistory);
+            // 4. Save Lifafa & Log Transaction
+            let lifafas = loadLifafas();
+            lifafas.push(newLifafa);
+            saveLifafas(lifafas);
+            
+            let senderHistory = getHistory(senderUsername);
+            senderHistory.push({ date: Date.now(), type: 'debit', amount: totalAmount, txnId: `LIFAFA_CREATED_${lifafaType}_` + uniqueId, note: `Created ${lifafaType} Lifafa: ${title}` });
+            saveHistory(senderUsername, senderHistory);
 
 
-        // 5. Final UI Update
-        refreshBalanceUI();
-        renderLifafas();
-        appendLog(`SUCCESS: ${lifafaType} Lifafa created! Share link with ID: ${uniqueId}`, 'success');
-        
-        const linkMsg = document.createElement('p');
-        linkMsg.innerHTML = `<span style="color: #00e0ff; font-weight:bold;">Link:</span> ${window.location.origin}/panel/claim.html?id=${uniqueId}`;
-        logArea.prepend(linkMsg);
-        
-        form.reset(); 
-        youtubeLinkInput.value = ''; // Reset YouTube link
-        youtubeVideoInfoContainer.style.display = 'none';
-        referAmountInput.value = ''; // Reset new fields
-        referCommentInput.value = ''; // Reset new fields
+            // 5. Final UI Update
+            refreshBalanceUI();
+            renderLifafas();
+            appendLog(`SUCCESS: ${lifafaType} Lifafa created! Share link with ID: ${uniqueId}`, 'success');
+            
+            const linkMsg = document.createElement('p');
+            linkMsg.innerHTML = `<span style="color: #00e0ff; font-weight:bold;">Link:</span> ${window.location.origin}/panel/claim.html?id=${uniqueId}`;
+            logArea.prepend(linkMsg);
+            
+            form.reset(); 
+            youtubeLinkInput.value = ''; 
+            youtubeVideoInfoContainer.style.display = 'none';
+            if (referAmountInput) referAmountInput.value = ''; 
+            if (referCommentInput) referCommentInput.value = '';
+
+            // Clean up current auto-save draft
+            const draftKeyToDelete = senderUsername + '-' + lifafaType;
+            let currentDrafts = loadDrafts();
+            const updatedDrafts = currentDrafts.filter(d => d.key !== draftKeyToDelete);
+            saveDrafts(updatedDrafts); 
+        });
     });
-});
+
     // Logout Button (For consistency)
     if(logoutBtn) {
         logoutBtn.addEventListener('click', () => {

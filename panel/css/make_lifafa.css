@@ -471,3 +471,60 @@ body::before {
     box-shadow: 0 0 5px rgba(255,0,119,0.8);
     border: 2px solid #1a1a2a;
 }
+
+/* panel/css/make_lifafa.css: NEW BLOCK (Add this at the very end of the file) */
+
+/* --- DRAFT MODAL STYLES --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    border: 1px solid rgba(255, 204, 0, 0.4); 
+    backdrop-filter: blur(10px) saturate(1.2);
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+    width: 90%;
+    max-width: 400px;
+    padding: 25px;
+    border-radius: 18px;
+    position: relative;
+    color: #fff;
+}
+.close-modal-btn {
+    position: absolute; top: 10px; right: 15px; background: none; border: none; 
+    color: #fff; font-size: 1.5rem; cursor: pointer;
+}
+
+/* Draft List Items */
+.draft-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dotted rgba(255,255,255,0.1);
+}
+.draft-item-info {
+    color: #fff;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.draft-item-info:hover {
+    color: #00e0ff;
+    text-decoration: underline;
+}
+.draft-item-delete {
+    background: #ff0077;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
