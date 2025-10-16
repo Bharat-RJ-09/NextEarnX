@@ -60,10 +60,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
             if (newPrice !== undefined && planName !== "1 Week Free Trial") {
                 const priceElement = card.querySelector('.price');
                 if (priceElement) priceElement.textContent = `₹${newPrice}`;
+                
+                // Update original price if exists
 
                 const originalPriceElement = card.querySelector('.original-price');
                 if (originalPriceElement) {
                     const defaultOriginal = planName === "1 Month" ? 129 : planName === "2 Months" ? 229 : planName === "3 Months" ? 329 : null;
+                    if (defaultOriginal) originalPriceElement.textContent = `₹${defaultOriginal}`;
+                    // Update discount tag
                     const discount = Math.round(((defaultOriginal - newPrice) / defaultOriginal) * 100);
                     const saveTag = card.querySelector('.save-tag');
                     if (saveTag) saveTag.textContent = `Save ${discount}%`;
