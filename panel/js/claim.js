@@ -1,5 +1,5 @@
 // panel/js/claim.js - Lifafa Claim Logic with Validation Checks
-
+ 
 document.addEventListener('DOMContentLoaded', () => {
     
     // UI Elements
@@ -161,14 +161,23 @@ document.addEventListener('DOMContentLoaded', () => {
         claimChecksPassed.claimed = true;
         return true;
     }
-
-    function checkAccessCode() {
+ 
+   function checkAccessCode() {
+        // Check if Lifafa requires an Access Code
         if (lifafaData.accessCode) {
-            reqStatusCode.textContent = "Access Code: Required (Enter below)";
-            accessCodeForm.style.display = 'block';
-            mainClaimBtn.disabled = true;
-            claimChecksPassed.code = false;
+            // Check if the user has already entered the code and passed the check
+            if (claimChecksPassed.code) {
+                updateReqStatus(reqStatusCode, true, "Access Code: Verified.");
+                accessCodeForm.style.display = 'none';
+            } else {
+                // If code is required and not yet verified, show the form
+                reqStatusCode.textContent = "Access Code: Required (Enter below)";
+                accessCodeForm.style.display = 'block';
+                mainClaimBtn.disabled = true;
+                claimChecksPassed.code = false;
+            }
         } else {
+            // If code is NOT required, set status to passed
             updateReqStatus(reqStatusCode, true, "Access Code: Not Required.");
             claimChecksPassed.code = true;
         }
@@ -217,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- EVENT HANDLERS ---
-    
+     
     // 1. Access Code Verification
     accessCodeForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -226,11 +235,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (enteredCode === lifafaData.accessCode) {
             updateReqStatus(reqStatusCode, true, "Access Code: Verified.");
             accessCodeForm.style.display = 'none';
-            claimChecksPassed.code = true;
+            claimChecksPassed.code = true; // CRITICAL: Mark as passed
             
-            if (claimChecksPassed.ban && claimChecksPassed.telegram && claimChecksPassed.referral) {
+            // Re-check all requirements. If everything else is already green, enable button.
+            const allSimpleChecksPass = claimChecksPassed.ban && claimChecksPassed.telegram && claimChecksPassed.referral;
+
+            if (allSimpleChecksPass) {
                  mainClaimBtn.disabled = false;
                  appendLog("Access code correct. Ready to claim.", 'success');
+            } else {
+                 appendLog("Access code correct, but other requirements pending.", 'info');
             }
         } else {
             alert("❌ Incorrect Access Code. Try again.");
