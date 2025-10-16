@@ -224,22 +224,62 @@ document.addEventListener('DOMContentLoaded', () => {
     // Password Toggle Functionality
     document.querySelectorAll('.password-toggle').forEach(toggle => {
         toggle.addEventListener('click', (e) => {
-            // Find the closest password-box container
             const box = e.target.closest('.password-box');
             if (!box) return;
 
-            // Find the input field inside that box
-            const targetInput = box.querySelector('input[type="password"], input[type="text"]');
+            // Find the input field inside that box (using specific ID fetch)
+            const targetId = e.target.dataset.target;
+            const targetInput = document.getElementById(targetId);
             
             if (targetInput) {
                  const type = targetInput.getAttribute('type') === 'password' ? 'text' : 'password';
                  targetInput.setAttribute('type', type);
+                 
+                 // Toggle icons between eye and eye-off
                  e.target.classList.toggle('ri-eye-line');
                  e.target.classList.toggle('ri-eye-off-line');
             }
         });
     });
 
+    // Password Submission
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newPass = newPasswordInput.value;
+            const confirmPass = confirmPasswordInput.value;
+
+            if (newPass !== confirmPass) {
+                alert("❌ Error: Passwords do not match!");
+                return;
+            }
+            if (newPass.length < 6) {
+                alert("❌ Error: Password must be at least 6 characters.");
+                return;
+            }
+
+            // Update user object
+            if (currentUser) {
+                const oldPassword = currentUser.password;
+                
+                if (newPass === oldPassword) {
+                     alert("⚠️ New password is the same as the old one.");
+                     passwordModal.style.display = 'none';
+                     return;
+                }
+                
+                currentUser.password = newPass;
+                saveCurrentUser();
+                updateMainUserList(currentUser);
+                
+                alert("✅ Password updated successfully! Use the new password next time you log in.");
+                
+                // Cleanup and close
+                changePasswordForm.reset();
+                passwordModal.style.display = 'none';
+            }
+        });
+    }
     // Password Submission
     if (changePasswordForm) {
         changePasswordForm.addEventListener('submit', (e) => {
