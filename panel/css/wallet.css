@@ -120,6 +120,38 @@ body::before {
     color: #ff0077;
     margin-bottom: 20px;
 }
+
+/* panel/css/wallet.css: REPLACEMENT BLOCK (Add this after the Deposit Section H2 style) */
+
+/* Deposit Section */
+.deposit-section h2 {
+    color: #ff0077; /* Pink color for deposit */
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(255,255,255,0.1);
+}
+/* NEW: Withdrawal Section */
+.withdrawal-section h2 {
+    color: #00e0ff; /* Cyan color for withdrawal */
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(255,255,255,0.1);
+}
+
+/* Form Groups and Inputs (same as deposit section) */
+.form-group { margin-bottom: 15px; }
+
+/* Withdrawal Button (Distinct Blue/Cyan look) */
+.submit-btn.withdraw-btn {
+    background: #00e0ff;
+    color: #1a1a2a;
+    box-shadow: 0 0 10px rgba(0,224,255,0.5);
+}
+.submit-btn.withdraw-btn:hover { 
+    background: #33ffff;
+}
+
+
 .form-group { margin-bottom: 15px; }
 label { display: block; margin-bottom: 5px; color: #00e0ff; }
 input {

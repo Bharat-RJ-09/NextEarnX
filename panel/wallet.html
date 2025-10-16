@@ -21,7 +21,7 @@
             <h2>Current Balance</h2>
             <p id="currentBalance">₹ 0.00</p>
             <button id="refreshBtn" class="action-btn"><i class="ri-refresh-line"></i> Refresh</button>
-        </section>
+        </section> 
 
         <section class="deposit-section card">
             <h2>Add Funds (Deposit)</h2>
@@ -31,6 +31,21 @@
                     <input type="number" id="depositAmount" min="60" placeholder="Enter amount" required>
                 </div>
                 <button type="submit" class="submit-btn"><i class="ri-wallet-3-line"></i> Proceed to Pay</button>
+            </form>
+        </section>
+
+        <section class="withdrawal-section card">
+            <h2>Withdraw Funds (UPI)</h2>
+            <form id="withdrawalForm">
+                <div class="form-group">
+                    <label for="withdrawAmount">Amount (Min ₹150):</label> 
+                    <input type="number" id="withdrawAmount" min="150" placeholder="Enter amount" required>
+                </div>
+                <div class="form-group">
+                    <label for="upiAddress">Your UPI Address:</label>
+                    <input type="text" id="upiAddress" placeholder="e.g., yourname@bank" required>
+                </div>
+                <button type="submit" id="withdrawBtn" class="submit-btn withdraw-btn"><i class="ri-send-plane-line"></i> Request Withdrawal</button>
             </form>
         </section>
 

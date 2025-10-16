@@ -1,15 +1,23 @@
 // panel/js/wallet.js - Updated for Global Settings
 
 document.addEventListener('DOMContentLoaded', () => {
-    const balanceElement = document.getElementById('currentBalance');
+   const balanceElement = document.getElementById('currentBalance');
     const depositForm = document.getElementById('depositForm');
     const depositInput = document.getElementById('depositAmount');
+    
+    // NEW WITHDRAWAL ELEMENTS
+    const withdrawalForm = document.getElementById('withdrawalForm');
+    const withdrawAmountInput = document.getElementById('withdrawAmount');
+    const upiAddressInput = document.getElementById('upiAddress');
+    
     const historyLog = document.getElementById('historyLog');
     const refreshBtn = document.getElementById('refreshBtn');
     const logoutBtn = document.getElementById('logoutBtn');
 
     // --- GLOBAL SETTINGS UTILITY ---
+    const MIN_WITHDRAWAL = 150; // NEW CONSTANT
     const DEFAULTS = { minDeposit: 60 };
+    
     function loadSettings() {
         try {
             const settings = JSON.parse(localStorage.getItem('nextEarnXGlobalSettings'));
@@ -20,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const settings = loadSettings();
     
-    // --- UI Update: Min Deposit Label ---
+    // --- UI Update: Min Deposit Label & Min Withdrawal Attribute ---
     const depositLabel = document.querySelector('label[for="depositAmount"]');
     if(depositLabel) {
         depositLabel.textContent = `Amount (Min ₹${settings.minDeposit}):`;
@@ -29,6 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
         depositInput.setAttribute('min', settings.minDeposit);
     }
     
+    // Set Min Withdrawal Input attribute
+    if(withdrawAmountInput) {
+        withdrawAmountInput.setAttribute('min', MIN_WITHDRAWAL);
+    }    
 
     // --- Utility Functions ---
     function getBalance() {
@@ -111,4 +123,55 @@ document.addEventListener('DOMContentLoaded', () => {
         const upiURL = `purchase.html?plan=Deposit&price=${amount}&redirect=wallet`;
         window.location.href = upiURL;
     });
+    // panel/js/wallet.js: REPLACEMENT BLOCK (Add this immediately after depositForm listener)
+
+    // Withdrawal Form Submission (Mock Logic)
+    if (withdrawalForm) {
+        withdrawalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amount = parseFloat(withdrawAmountInput.value);
+            const upiAddress = upiAddressInput.value.trim();
+            const currentBalance = getBalance();
+            
+            if (isNaN(amount) || amount < MIN_WITHDRAWAL) {
+                alert(`Withdrawal amount must be a minimum of ₹${MIN_WITHDRAWAL}.`);
+                return;
+            }
+            if (currentBalance < amount) {
+                alert(`Insufficient Balance: ₹${currentBalance.toFixed(2)}. Cannot withdraw ₹${amount.toFixed(2)}.`);
+                return;
+            }
+            if (!upiAddress) {
+                alert('Please enter a valid UPI address.');
+                return;
+            }
+
+            if (confirm(`Confirm withdrawal request of ₹${amount.toFixed(2)} to ${upiAddress}?`)) {
+                
+                // --- MOCK DEDUCTION ---
+                const newBalance = currentBalance - amount;
+                saveBalance(newBalance);
+
+                // --- RECORD TRANSACTION (DEBIT) ---
+                let history = getHistory();
+                history.push({
+                    date: Date.now(),
+                    type: 'debit',
+                    amount: amount,
+                    txnId: 'WITHDRAWAL_REQ_' + Date.now(),
+                    note: `Withdrawal Request: ₹${amount.toFixed(2)} to ${upiAddress} (Pending)`
+                });
+                saveHistory(history);
+
+                // --- FINAL ALERT & UI REFRESH ---
+                alert(`✅ Withdrawal Request Submitted!\n₹${amount.toFixed(2)} will be processed within 24 hours. New Balance: ₹${newBalance.toFixed(2)}`);
+                
+                updateBalanceUI();
+                updateHistoryUI();
+                withdrawalForm.reset();
+            }
+        });
+    }
 });
+
+// End of wallet.js
