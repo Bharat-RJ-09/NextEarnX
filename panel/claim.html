@@ -1,122 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claim Lifafa - NextEarnX</title>
-    <link rel="stylesheet" href="css/claim.css">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claim Lifafa - NextEarnX</title>
+  <link rel="stylesheet" href="css/claim.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
 </head>
-
-<body>
-
-    <nav class="navbar">
-        <a href="index.html" class="menu-btn"><i class="ri-arrow-left-line"></i></a>
-        <h1 class="logo">NextEarn<span>X</span></h1>
-        <button id="logoutBtn" style="display:none;">Logout</button>
-    </nav>
-
-    <main class="claim-container">
-
-        <div id="loadingState" class="claim-status-card loading" style="display: block;">
+<body style="padding-top: 0;"> 
+    
+    <main class="claim-container full-screen-container">
+        
+        <div id="loadingState" class="full-screen-card loading" style="display: block;">
             <i class="ri-loader-line ri-spin"></i>
             <h2>Loading Lifafa Details...</h2>
             <p>Please wait while we verify the link.</p>
         </div>
-
-        <div id="errorState" class="claim-status-card error" style="display: none;">
+        
+        <div id="errorState" class="full-screen-card error" style="display: none;">
             <i class="ri-alert-line"></i>
             <h2 id="errorTitle">Lifafa Not Found</h2>
             <p id="errorMessage">The link is invalid or the Lifafa has expired/closed.</p>
-            <a href="login.html" class="action-btn">Go to Login</a>
+            <a href="login.html" class="action-btn primary-btn">Go to Login</a>
         </div>
+        
+        <section id="accountRequiredState" class="full-screen-card account-required" style="display: none;">
+            <i class="ri-user-unfollow-line" style="font-size: 5rem; color:#ff0077;"></i>
+            <h2>Account Required</h2>
+            <p>To claim this Lifafa, please create or login to an account using the phone number: <span id="requiredMobileDisplay" style="font-weight: bold; color: #00e0ff;">Loading...</span></p>
+            
+            <a href="signup.html" class="action-btn primary-btn" style="width: 100%; margin-top: 20px;">Create Account</a>
+            <a href="login.html" class="action-btn" style="width: 100%; margin-top: 10px;">Already have an account? Login</a>
+        </section>
 
         <section id="claimSection" class="claim-card card" style="display: none;">
-
-            <h2 id="lifafaTitle">🎁 Lifafa Title Here</h2>
-<p class="creator-info">From: <span id="creatorUsername">Loading...</span></p>
-<p class="amount-info">Amount: <span id="claimAmountDisplay">₹?.??</span> (for <span id="claimCountDisplay">?</span> users)</p>
-
-<div id="requirementsStatus" class="requirements-box">
-    <h4>Claim Requirements:</h4>
-    <ul id="requirementsList">
-        <li class="status-pending" id="reqStatusBan"><i class="ri-alert-line"></i> Banned Status Check: Pending</li>
-        <li class="status-pending" id="reqStatusCode"><i class="ri-lock-line"></i> Access Code: N/A</li>
-        <li class="status-pending" id="reqStatusTelegram"><i class="ri-telegram-line"></i> Telegram Join: N/A</li>
-        <li class="status-pending" id="reqStatusYoutube"><i class="ri-youtube-line"></i> YouTube Watch: N/A</li>
-        <li class="status-pending" id="reqStatusReferral"><i class="ri-group-line"></i> Referrals: N/A</li>
-    </ul>
-</div>
-
-<form id="accessCodeForm" style="display:none;">
-    <div class="form-group input-icon-group">
-        <i class="ri-key-2-line"></i>
-        <input type="text" id="accessCodeInput" placeholder="Enter Access Code" required>
-    </div>
-    <button type="submit" class="submit-btn check-btn"><i class="ri-lock-unlock-line"></i> Verify Code</button>
-</form>
-
-<div id="youtubeControlSection" style="display:none; margin-bottom: 20px;">
-    <div id="youtubeVideoPlayer" style="margin: 10px 0; max-width: 100%; height: 200px; background: #000; border-radius: 8px; border: 2px solid #ffcc00; display:flex; align-items:center; justify-content:center; color:#fff; font-size: 0.9rem;">
-        Video Player Mock (Link: <a id="videoLinkDisplay" href="#" target="_blank" style="color:#00e0ff;">Loading...</a>)
-    </div>
-    <button id="youtubeVerifyBtn" class="submit-btn check-btn" disabled><i class="ri-check-line"></i> Mark Video Watched</button>
-</div>
-
-<div id="referralControlSection" style="display:none; margin-bottom: 20px;">
-    <p style="font-size: 0.95rem; color:#fff; margin-bottom: 10px;">
-        Required Referrals: <span id="requiredReferralCount" style="color: #ffcc00; font-weight: bold;">?</span>
-    </p>
-    <p style="font-size: 0.95rem; color:#fff; margin-bottom: 10px;">
-        Your Current Active Referrals: <span id="currentReferralCount" style="color: #aaffaa; font-weight: bold;">0</span>
-    </p>
-    <button id="referralCheckBtn" class="submit-btn check-btn"><i class="ri-refresh-line"></i> Check Status</button>
-</div>
-
-<button id="mainClaimBtn" class="submit-btn claim-btn" disabled><i class="ri-coupon-line"></i> Claim Lifafa</button>
-
-<p id="finalStatusMessage" class="final-msg"></p>
-
-<div class="claim-log-area">
-    <p>Status Log:</p>
-    <div id="claimLog"></div>
-</div>
-
-            <div id="youtubeControlSection" style="display:none; margin-bottom: 20px;">
-                <div id="youtubeVideoPlayer"
-                    style="margin: 10px 0; max-width: 100%; height: 200px; background: #000; border-radius: 8px; border: 2px solid #ffcc00; display:flex; align-items:center; justify-content:center; color:#fff; font-size: 0.9rem;">
-                    Video Player Mock (Link: <a id="videoLinkDisplay" href="#" target="_blank"
-                        style="color:#00e0ff;">Loading...</a>)
-                </div>
-                <button id="youtubeVerifyBtn" class="submit-btn check-btn" disabled><i class="ri-check-line"></i> Mark
-                    Video Watched</button>
+            
+            <div class="claim-header">
+                <h2 id="lifafaTitle">🎁 Lifafa Title Here</h2>
+                <p class="amount-info">Amount: <span id="claimAmountDisplay">₹?.??</span></p>
             </div>
 
-            <form id="accessCodeForm" style="display:none;">
+            <form id="mobileForm" class="mobile-input-form">
                 <div class="form-group input-icon-group">
-                    <i class="ri-key-2-line"></i>
-                    <input type="text" id="accessCodeInput" placeholder="Enter Access Code" required>
+                    <i class="ri-phone-line" style="color:#4169E1;"></i>
+                    <input type="tel" id="claimMobileInput" placeholder="Enter 10-digit NEX Number" pattern="[0-9]{10}" maxlength="10" required>
                 </div>
-                <button type="submit" class="submit-btn check-btn"><i class="ri-lock-unlock-line"></i> Verify
-                    Code</button>
+                <button type="submit" id="mobileCheckBtn" class="submit-btn primary-btn">
+                    <i class="ri-send-plane-line"></i> CLAIM <span id="initialClaimAmount">₹?</span>
+                </button>
             </form>
 
-            <button id="mainClaimBtn" class="submit-btn claim-btn" disabled><i class="ri-coupon-line"></i> Claim
-                Lifafa</button>
+            <div id="claimDetailsContainer" style="display: none;">
+                <div id="requirementsStatus" class="requirements-box">
+                    <h4>Claim Requirements:</h4>
+                    <ul id="requirementsList">
+                        <li class="status-pending" id="reqStatusBan"><i class="ri-alert-line"></i> Banned Status Check: Pending</li>
+                        <li class="status-pending" id="reqStatusSpecialUser"><i class="ri-star-line"></i> Special User Check: N/A</li>
+                        <li class="status-pending" id="reqStatusCode"><i class="ri-lock-line"></i> Access Code: N/A</li>
+                        <li class="status-pending" id="reqStatusTelegram"><i class="ri-telegram-line"></i> Telegram Join: N/A</li>
+                        <li class="status-pending" id="reqStatusYoutube"><i class="ri-youtube-line"></i> YouTube Watch: N/A</li>
+                    </ul>
+                </div>
 
-            <p id="finalStatusMessage" class="final-msg"></p>
+                <div id="specialLifafaInterface" style="margin-bottom: 20px;"></div>
+                
+                <form id="accessCodeForm" style="display:none;">
+                    <div class="form-group input-icon-group">
+                        <i class="ri-key-2-line"></i>
+                        <input type="text" id="accessCodeInput" placeholder="Enter Access Code" required>
+                    </div>
+                    <button type="submit" class="submit-btn check-btn"><i class="ri-lock-unlock-line"></i> Verify Code</button>
+                </form>
 
-            <div class="claim-log-area">
-                <p>Status Log:</p>
-                <div id="claimLog"></div>
+                <div id="youtubeControlSection" style="display:none; margin-bottom: 20px;">
+                    <div id="youtubeVideoPlayer" style="margin: 10px 0; max-width: 100%; height: 200px; background: #000; border-radius: 8px; border: 2px solid #ffcc00; display:flex; align-items:center; justify-content:center; color:#fff; font-size: 0.9rem;">
+                        Video Player Mock (<a id="videoLinkDisplay" href="#" target="_blank" style="color:#00e0ff;">Click to Watch</a>)
+                    </div>
+                    <button id="youtubeVerifyBtn" class="submit-btn check-btn"><i class="ri-check-line"></i> Mark Video Watched</button>
+                </div>
+                
+                <button id="finalClaimBtn" class="submit-btn claim-btn" disabled><i class="ri-coupon-line"></i> Final Claim</button>
+
+                <p id="finalStatusMessage" class="final-msg"></p>
+                
+                <div class="claim-log-area">
+                    <p>Status Log:</p>
+                    <div id="claimLog"></div>
+                </div>
             </div>
-
         </section>
 
     </main>
 
     <script src="js/claim.js"></script>
 </body>
-
 </html>
