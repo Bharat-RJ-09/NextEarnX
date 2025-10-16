@@ -177,27 +177,33 @@ document.addEventListener('DOMContentLoaded', () => {
     renderLifafas();
     updateTelegramStatusUI(); // CALL HERE
  
-   // --- ACCORDION TOGGLE LOGIC (UPDATED FOR SMOOTH ANIMATION) ---
-    document.querySelectorAll('.accordion-header').forEach(header => {
+   // --- ACCORDION TOGGLE LOGIC (FIXED FOR RELIABLE EXCLUSIVE ANIMATION) ---
+    const allHeaders = document.querySelectorAll('.accordion-header');
+    
+    allHeaders.forEach(header => {
         header.addEventListener('click', () => {
             const targetId = header.dataset.target;
             const content = document.getElementById(targetId);
             
             if (content) {
-                // Toggle 'active' class on both header and content
-                header.classList.toggle('active');
-                content.classList.toggle('active');
-                
-                // Since the content contained an old display logic, this simple toggle 
-                // ensures CSS's max-height transition takes over smoothly.
-                
-                // Close other open accordions (optional, but good UX for features)
-                document.querySelectorAll('.accordion-header').forEach(otherHeader => {
-                    if (otherHeader !== header && otherHeader.classList.contains('active')) {
+                // Check if the clicked accordion is currently active
+                const wasActive = header.classList.contains('active');
+
+                // 1. Close all open accordions first (Header and Content)
+                allHeaders.forEach(otherHeader => {
+                    const otherContent = document.getElementById(otherHeader.dataset.target);
+                    if (otherHeader.classList.contains('active')) {
                         otherHeader.classList.remove('active');
-                        document.getElementById(otherHeader.dataset.target).classList.remove('active');
+                        if (otherContent) otherContent.classList.remove('active');
                     }
                 });
+                
+                // 2. If the clicked accordion was NOT active (i.e., we want to open it now)
+                if (!wasActive) {
+                    header.classList.add('active');
+                    content.classList.add('active');
+                }
+                // Agar wasActive true tha, toh step 1 mein woh band ho gaya, aur step 2 mein woh band hi rahega (jo ki expected hai).
             }
         });
     });
@@ -275,15 +281,19 @@ document.querySelectorAll('.lifafa-form-new').forEach(form => {
         const youtubeLink = document.getElementById('lifafaYoutubeLink_Normal')?.value.trim();
         const referCount = parseInt(document.getElementById('lifafaReferCount_Normal')?.value) || 0;
         const requiredChannels = globalSettings.telegramChannels || [];
-    // Logout Button (For consistency)
-    if(logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('session');
-            localStorage.removeItem('nextEarnXCurrentUser');
-            alert("Logged out from NextEarnX!");
-            window.location.href = 'login.html';
-        });
-    }
-});
+        
+        // TODO: implement lifafa creation and validation logic here
+    }); // end submit handler
+}); // end forEach
 
-// End of make_lifafa.js
+// Logout Button (For consistency) - moved outside submit handler so it attaches once on load
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('session');
+        localStorage.removeItem('nextEarnXCurrentUser');
+        alert("Logged out from NextEarnX!");
+        window.location.href = 'login.html';
+    });
+}
+
+}); // end DOMContentLoaded
