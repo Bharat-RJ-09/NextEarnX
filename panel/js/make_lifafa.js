@@ -153,21 +153,28 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshBalanceUI();
     renderLifafas();
     updateTelegramStatusUI(); // CALL HERE
-
-    // --- ACCORDION TOGGLE LOGIC ---
+ 
+   // --- ACCORDION TOGGLE LOGIC (UPDATED FOR SMOOTH ANIMATION) ---
     document.querySelectorAll('.accordion-header').forEach(header => {
         header.addEventListener('click', () => {
             const targetId = header.dataset.target;
             const content = document.getElementById(targetId);
             
             if (content) {
+                // Toggle 'active' class on both header and content
                 header.classList.toggle('active');
+                content.classList.toggle('active');
                 
-                if (content.style.display === 'block') {
-                    content.style.display = 'none';
-                } else {
-                    content.style.display = 'block';
-                }
+                // Since the content contained an old display logic, this simple toggle 
+                // ensures CSS's max-height transition takes over smoothly.
+                
+                // Close other open accordions (optional, but good UX for features)
+                document.querySelectorAll('.accordion-header').forEach(otherHeader => {
+                    if (otherHeader !== header && otherHeader.classList.contains('active')) {
+                        otherHeader.classList.remove('active');
+                        document.getElementById(otherHeader.dataset.target).classList.remove('active');
+                    }
+                });
             }
         });
     });
@@ -307,3 +314,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// End of make_lifafa.js
