@@ -3,6 +3,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     const SETTINGS_KEY = 'nextEarnXGlobalSettings'; // Define settings key
+
+    // NEW YOUTUBE ELEMENTS
+    const checkYoutubeVideoBtn = document.getElementById('checkYoutubeVideoBtn');
+    const youtubeLinkInput = document.getElementById('lifafaYoutubeLink_Normal');
+    const youtubeDurationControl = document.getElementById('youtubeDurationControl');
+    const watchDurationSlider = document.getElementById('watchDurationSlider');
+    const watchDurationDisplay = document.getElementById('watchDurationDisplay');
+    const videoTotalDurationDisplay = document.getElementById('videoTotalDuration');
+    
+    let videoDurationSeconds = 0; // Stores the mock duration in seconds of the YouTube video
+
+    // --- ELEMENTS ---
+
     
     // UI Elements
     const currentBalanceDisplay = document.getElementById('currentBalanceDisplay'); 
@@ -170,6 +183,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // panel/js/make_lifafa.js: REPLACEMENT BLOCK (Add this after the secondary tab switching logic, around line 200)
+
+    // --- YOUTUBE DURATION LOGIC ---
+
+    // 1. Check Video Button Handler (Mock Duration Fetch)
+    if (checkYoutubeVideoBtn) {
+        checkYoutubeVideoBtn.addEventListener('click', () => {
+            const link = youtubeLinkInput.value.trim();
+            youtubeDurationControl.style.display = 'none';
+
+            if (!link || !link.startsWith('http')) {
+                alert("❌ Please enter a valid YouTube link.");
+                return;
+            }
+
+            // MOCK LOGIC: Simulate fetching video duration (3 to 10 minutes)
+            const minTime = 180; // 3 minutes
+            const maxTime = 600; // 10 minutes
+            videoDurationSeconds = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+            const totalMinutes = Math.ceil(videoDurationSeconds / 60);
+
+            // Update UI with max duration
+            watchDurationSlider.max = totalMinutes;
+            watchDurationSlider.value = totalMinutes; // Default to max
+            videoTotalDurationDisplay.textContent = `${totalMinutes} min`;
+
+            // Display control and update initial watch time display
+            youtubeDurationControl.style.display = 'block';
+            watchDurationDisplay.textContent = `${totalMinutes} min`;
+
+            appendLog(`Video link verified (MOCK). Max duration: ${totalMinutes} minutes.`, 'info');
+        });
+    }
+
+    // 2. Slider Input Handler
+    if (watchDurationSlider) {
+        watchDurationSlider.addEventListener('input', (e) => {
+            const minutes = e.target.value;
+            watchDurationDisplay.textContent = `${minutes} min`;
+        });
+    } 
+
+
     // --- INITIALIZE & TAB SWITCHING LOGIC ---
     getCurrentUserSession(); 
     loadGlobalSettings(); // CALL HERE
@@ -257,7 +313,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ------------------------------------------
      
- // --- LIFAFA CREATION LOGIC (ALL TYPES) ---
+ // panel/js/make_lifafa.js: REPLACEMENT BLOCK for the LIFAFA CREATION LOGIC section
+
+// ------------------------------------------
+// --- LIFAFA CREATION LOGIC (ALL TYPES) ---
 // ------------------------------------------
 
 document.querySelectorAll('.lifafa-form-new').forEach(form => {
@@ -276,16 +335,72 @@ document.querySelectorAll('.lifafa-form-new').forEach(form => {
         const accessCode = document.getElementById('lifafaAccessCode_Normal').value.trim();
         const rawSpecialUsers = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
         
-        // CRITICAL FIX: Filter and get only valid 10-digit unique mobile numbers
         const specialUsers = parseAndFilterNumbers(rawSpecialUsers); 
         
-        const youtubeLink = document.getElementById('lifafaYoutubeLink_Normal')?.value.trim();
+        const youtubeLink = youtubeLinkInput.value.trim();
+        
+        // NEW: Get required watch duration in seconds
+        let watchDurationSeconds = 0;
+        if (youtubeLink && youtubeDurationControl.style.display !== 'none') {
+             const requiredMinutes = parseInt(watchDurationSlider.value) || 0;
+             watchDurationSeconds = requiredMinutes * 60;
+        } else if (youtubeLink) {
+             // If link is provided but check wasn't run, alert the user or default to a small value (let's enforce check)
+             alert("⚠️ Please click 'Check Video' and set the watch duration before creating Lifafa with a YouTube link.");
+             return;
+        }
+        
         const referCount = parseInt(document.getElementById('lifafaReferCount_Normal')?.value) || 0;
         const requiredChannels = globalSettings.telegramChannels || [];
+
+        // TYPE-SPECIFIC FIELDS
+        let typeSpecificData = {};
+// ... (rest of the logic remains the same)
         
-        // TODO: implement lifafa creation and validation logic here
-    }); // end submit handler
-}); // end forEach
+        // 1. Validation (Same as before)
+// ... (Validation code) ...
+
+        // 2. Confirmation (Same as before)
+// ... (Confirmation code) ...
+
+        // 3. Execution: Deduct and Create Lifafa Object
+        const newBalance = currentBalance - totalAmount;
+        setBalance(senderUsername, newBalance);
+
+        const uniqueId = senderUsername.slice(0, 3).toUpperCase() + Math.random().toString(36).substring(2, 9).toUpperCase() + Date.now().toString().slice(-4);
+        
+        const newLifafa = {
+            id: uniqueId,
+            creator: senderUsername,
+            date: Date.now(),
+            type: lifafaType, 
+            title: title,
+            comment: comment,
+            redirectLink: redirectLink,
+            accessCode: accessCode || null,
+            specialUsers: specialUsers,
+            requirements: {
+                channels: requiredChannels,
+                youtube: youtubeLink || null,
+                watchDuration: watchDurationSeconds > 0 ? watchDurationSeconds : null, // NEW: Save duration
+                referrals: referCount > 0 ? referCount : null,
+            },
+            ...typeSpecificData,
+            totalAmount: totalAmount, 
+            count: count,
+            perClaim: perUserAmount, 
+            claims: [] 
+        };
+
+        // 4. Save Lifafa & Log Transaction (Same as before)
+// ... (Save and Log code) ...
+
+        // 5. Final UI Update (Same as before)
+// ... (Final UI Update code) ...
+    });
+});
+
+// ... (rest of the file follows, including the fixed accordion logic)
 
 // Logout Button (For consistency) - moved outside submit handler so it attaches once on load
 if (logoutBtn) {

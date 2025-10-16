@@ -98,8 +98,7 @@
                         <textarea id="lifafaSpecialUsers_Normal" rows="4"
                             placeholder="All Mobile numbers should be separated by comma (,), asterisk (*), period (.), space, or line by line"></textarea>
                     </div>
-                    <button type="button" class="action-btn check-btn"><i class="ri-check-line"></i> Check Numbers
-                        (Mock)</button>
+                    <button type="button" class="action-btn check-btn"><i class="ri-check-line"></i> Check Numbers </button>
                 </div> <br>
 
                 <div class="accordion-header red-header " data-target="telegramChannelContent">
@@ -132,14 +131,22 @@
                     <i class="ri-arrow-right-s-line arrow-icon"></i>
                 </div> <br>
                 <div class="accordion-content" id="youtubeVideoContent">
-                    <p class="mock-info" style="color:#ffcc00; margin-bottom:10px;">Future Feature: User must watch this
-                        video to claim.</p>
-                    <div class="form-group input-icon-group">
-                        <i class="ri-link"></i>
-                        <input type="text" id="lifafaYoutubeLink_Normal"
-                            placeholder="Enter YouTube Video Link (Optional)">
-                    </div>
-                </div>
+    <p class="mock-info" style="color:#ffcc00; margin-bottom:10px;">Future Feature: User must watch a minimum duration of this video to claim.</p>
+    
+    <div class="form-group input-icon-group">
+        <i class="ri-link"></i>
+        <input type="text" id="lifafaYoutubeLink_Normal" placeholder="Enter YouTube Video Link (Required)">
+    </div>
+    
+    <button type="button" id="checkYoutubeVideoBtn" class="action-btn check-btn" style="margin-top: 5px; background: #000000;"><i class="ri-search-line"></i> Check Video</button>
+
+    <div id="youtubeDurationControl" style="display:none; margin-top: 15px; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.05);">
+        <label for="watchDurationSlider">Required Watch Time: <span id="watchDurationDisplay" style="color:#00e0ff; font-weight:bold;">0 min</span></label>
+        
+        <input type="range" id="watchDurationSlider" min="1" max="1" value="1" style="width: 100%; margin: 10px 0;">
+        <p style="font-size: 0.8rem; color: #aaa;">Video Length: <span id="videoTotalDuration">0 min</span></p>
+    </div>
+</div>
 
                 <div class="accordion-header red-header" data-target="referEarnContent">
                     <i class="ri-share-forward-fill"></i>
