@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     const SETTINGS_KEY = 'nextEarnXGlobalSettings';
-    const DRAFT_KEY = 'nextEarnXLifafaDrafts';
+    const DRAFT_KEY = 'nextEarnXLifafaDrafts'; // NEW DRAFT KEY
     
     // UI Elements
     const currentBalanceDisplay = document.getElementById('currentBalanceDisplay'); 
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ACCORDION ELEMENTS
     const allAccordionHeaders = document.querySelectorAll('.accordion-header');
     
-    // YOUTUBE ELEMENTS
+    // NEW YOUTUBE ELEMENTS
     const checkYoutubeVideoBtn = document.getElementById('checkYoutubeVideoBtn');
     const youtubeLinkInput = document.getElementById('lifafaYoutubeLink_Normal');
     const youtubeVideoInfoContainer = document.getElementById('youtubeVideoInfoContainer');
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scratchSlider = document.getElementById('percentageSlider_Scratch');
     const sliderValueDisplay = document.getElementById('sliderValue_Scratch');
     
-    // DRAFT MODAL ELEMENTS
+    // NEW DRAFT MODAL ELEMENTS
     const draftModal = document.getElementById('draftModal');
     const openDraftModalBtn = document.getElementById('openDraftModalBtn');
     const closeDraftModalBtn = document.getElementById('closeDraftModalBtn');
@@ -51,9 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let senderUsername = '';
     let globalSettings = {}; 
     let videoDurationSeconds = 0; 
-    let currentLifafaType = 'Normal';
+    let currentLifafaType = 'Normal'; // Track current active tab
 
-    // --- UTILITIES (REFINED AND STABLE) ---
+    // --- UTILITIES (REFINED) ---
     
     function getCurrentUserSession() {
         try {
@@ -183,58 +183,51 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function loadDrafts() {
         try {
-            const globalDrafts = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]");
-            // Filter drafts that belong to the current user
-            return globalDrafts.filter(d => d.creator === senderUsername);
+            const drafts = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]");
+            return drafts.filter(d => d.creator === senderUsername);
         } catch {
             return [];
         }
     }
     
     function saveDrafts(drafts) {
-        const otherUserDrafts = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]").filter(d => d.creator !== senderUsername);
-        localStorage.setItem(DRAFT_KEY, JSON.stringify([...otherUserDrafts, ...drafts]));
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(drafts));
         renderDraftList();
     }
     
     function autoSaveLifafa() {
-        // Ensure senderUsername is set before saving
-        if (!senderUsername) return; 
-
         const formId = `${currentLifafaType.toLowerCase()}LifafaForm`;
         const form = document.getElementById(formId);
         if (!form) return;
         
         const timestamp = Date.now();
         
-        // Collect all form data
+        // Collect all form data (simplified approach for drafts)
         const formData = {
             type: currentLifafaType,
             title: document.getElementById(`lifafaTitle_${currentLifafaType}`)?.value || 'Untitled',
             data: {}
         };
         
+        // Collect all input values by ID for the current form type
         const inputs = form.querySelectorAll('input, select, textarea');
         inputs.forEach(input => {
-             // Handle select element value correctly
              formData.data[input.id] = input.value;
         });
 
-        // Collect Advanced Settings (since they are common and share IDs)
+        // Collect Advanced Settings (since they are common)
         formData.data.lifafaAccessCode_Normal = document.getElementById('lifafaAccessCode_Normal')?.value || '';
         formData.data.lifafaSpecialUsers_Normal = document.getElementById('lifafaSpecialUsers_Normal')?.value || '';
         formData.data.lifafaYoutubeLink_Normal = document.getElementById('lifafaYoutubeLink_Normal')?.value || '';
         formData.data.lifafaReferAmount_Normal = document.getElementById('lifafaReferAmount_Normal')?.value || '';
         formData.data.lifafaReferComment_Normal = document.getElementById('lifafaReferComment_Normal')?.value || '';
+        formData.data.lifafaReferCount_Normal = document.getElementById('lifafaReferCount_Normal')?.value || '';
         
-        // --- Handle Scratch Slider Value Save (CRITICAL FIX) ---
-        if (currentLifafaType === 'Scratch') {
-            formData.data.percentageSlider_Scratch = document.getElementById('percentageSlider_Scratch')?.value || '100';
-        }
-        
+        // Unique key based on user and form type
         const draftKey = senderUsername + '-' + currentLifafaType;
         
         let allDrafts = loadDrafts();
+        let otherUserDrafts = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]").filter(d => d.creator !== senderUsername);
         
         const existingIndex = allDrafts.findIndex(d => d.key === draftKey);
         
@@ -248,12 +241,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         if (existingIndex !== -1) {
-            allDrafts[existingIndex] = newDraft;
+            allDrafts[existingIndex] = newDraft; // Update existing
         } else {
-            allDrafts.push(newDraft);
+            allDrafts.push(newDraft); // Add new
         }
         
-        saveDrafts(allDrafts); // Uses helper function to merge and save
+        // Merge back and save globally
+        localStorage.setItem(DRAFT_KEY, JSON.stringify([...otherUserDrafts, ...allDrafts]));
+        draftCountDisplay.textContent = allDrafts.length;
     }
     
     function loadDraftToForm(draftData) {
@@ -271,16 +266,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. Fill inputs
         for (const id in draftData.data) {
             const input = document.getElementById(id);
-            if (input) {
-                input.value = draftData.data[id];
-            }
+            if (input) input.value = draftData.data[id];
         }
         
-        // 3. Special handling for YouTube related fields: Hide the info box
-        if (youtubeVideoInfoContainer) youtubeVideoInfoContainer.style.display = 'none'; 
-
-        // 4. Close Modal and Log
+        // 3. Close Modal and Log
         draftModal.style.display = 'none';
+        // Hide YouTube info container unless Check is run again
+        if (youtubeVideoInfoContainer) youtubeVideoInfoContainer.style.display = 'none'; 
         appendLog(`Draft for ${draftData.title} (${formType}) loaded.`, 'info');
     }
 
@@ -298,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = document.createElement('div');
             item.classList.add('draft-item');
             
-            const timeAgo = Math.ceil((Date.now() - draft.date) / 60000); 
+            const timeAgo = Math.ceil((Date.now() - draft.date) / 60000); // Minutes ago
             
             item.innerHTML = `
                 <div class="draft-item-info" data-key="${draft.key}" title="Click to load">
@@ -321,15 +313,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.draft-item-delete').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const key = e.target.dataset.key || e.target.closest('button').dataset.key;
-                let allDrafts = loadDrafts(); // Reload current user drafts
-                const updatedDrafts = allDrafts.filter(d => d.key !== key);
+                const updatedDrafts = drafts.filter(d => d.key !== key);
                 saveDrafts(updatedDrafts); // Re-save and re-render
                 appendLog(`Draft deleted.`, 'info');
             });
         });
     }
 
-    // --- LIFAFA LIST RENDERING ---
+    // --- LIFAFA LIST RENDERING --- (Unchanged)
     function renderLifafas() {
         const lifafas = loadLifafas().filter(l => l.creator === senderUsername);
         activeLifafasList.innerHTML = '';
@@ -373,12 +364,10 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshBalanceUI();
     renderLifafas();
     updateTelegramStatusUI();
-    renderDraftList(); 
+    renderDraftList(); // Render drafts on load
     
     // Auto-save interval (Every 2 seconds)
-    if (senderUsername) {
-        setInterval(autoSaveLifafa, 2000); 
-    }
+    setInterval(autoSaveLifafa, 2000); 
 
 
     // --- ACCORDION TOGGLE LOGIC (FIXED) ---
@@ -412,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.lifafa-tab-secondary').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const type = btn.dataset.lifafaType;
-            currentLifafaType = type;
+            currentLifafaType = type; // Update current type for auto-save
 
             document.querySelectorAll('.lifafa-tab-secondary').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.lifafa-form-new').forEach(f => f.style.display = 'none');
@@ -421,6 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`${type.toLowerCase()}LifafaForm`).style.display = 'block';
             logArea.innerHTML = `<p>Ready to create ${type} Lifafa...</p>`;
             
+            // Hide YouTube info container on tab switch
             if (youtubeVideoInfoContainer) youtubeVideoInfoContainer.style.display = 'none'; 
 
             e.stopPropagation(); 
@@ -508,6 +498,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- DRAFT MODAL LISTENERS (NEW) ---
+    if(openDraftModalBtn) {
+        openDraftModalBtn.addEventListener('click', () => {
+            renderDraftList();
+            draftModal.style.display = 'flex';
+        });
+    }
+    if(closeDraftModalBtn) {
+        closeDraftModalBtn.addEventListener('click', () => {
+            draftModal.style.display = 'none';
+        });
+    }
+    if(clearAllDraftsBtn) {
+        clearAllDraftsBtn.addEventListener('click', () => {
+            if (confirm("Are you sure you want to delete ALL saved drafts?")) {
+                const otherUserDrafts = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]").filter(d => d.creator !== senderUsername);
+                localStorage.setItem(DRAFT_KEY, JSON.stringify(otherUserDrafts));
+                renderDraftList();
+                appendLog('All drafts cleared.', 'info');
+            }
+        });
+    }
+    
 
     // ------------------------------------------
     // --- LIFAFA CREATION LOGIC (ALL TYPES) ---
@@ -606,7 +619,6 @@ document.addEventListener('DOMContentLoaded', () => {
                  return;
             }
             if (currentBalance < totalAmount) {
-                alert(`Error: Insufficient balance. Available: ₹${currentBalance.toFixed(2)}. Total Cost: ₹${totalAmount.toFixed(2)}`);
                 appendLog(`Error: Insufficient balance. Available: ₹${currentBalance.toFixed(2)}. Total Cost: ₹${totalAmount.toFixed(2)}`, 'error');
                 return;
             }
