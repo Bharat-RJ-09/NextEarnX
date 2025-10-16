@@ -36,6 +36,29 @@ document.addEventListener('DOMContentLoaded', () => {
             senderUsername = user ? user.username : ''; 
         } catch { return null; }
     }
+
+    function appendLog(message, type = 'info') {
+        const p = document.createElement('p');
+        p.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+        p.style.color = type === 'success' ? '#aaffaa' : type === 'error' ? '#ffaaaa' : '#e0e0e0';
+        logArea.prepend(p);
+    }
+    
+    // NEW UTILITY: Parse and Filter Numbers
+    function parseAndFilterNumbers(rawText) {
+        if (!rawText) return [];
+        
+        // Split by comma, asterisk, period, space, or newline, and filter out empty strings
+        const potentialNumbers = rawText.split(/[,*.\s\n]+/).filter(Boolean);
+        
+        // Filter for valid 10-digit numeric strings
+        const validNumbers = potentialNumbers.filter(n => 
+            /^\d{10}$/.test(n.trim())
+        );
+        
+        // Return only unique, valid 10-digit numbers
+        return Array.from(new Set(validNumbers));
+    }
     
     // ADDED: Load Global Settings
     function loadGlobalSettings() {
@@ -208,101 +231,116 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LIFAFA CREATION LOGIC (NORMAL) ---
     // ------------------------------------------
 
-    if (normalLifafaForm) {
-        normalLifafaForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const perUserAmount = parseFloat(document.getElementById('lifafaPerUserAmount_Normal').value);
-            const count = parseInt(document.getElementById('lifafaCount_Normal').value);
-            const title = document.getElementById('lifafaTitle_Normal').value.trim();
-            const comment = document.getElementById('paymentComment_Normal').value.trim();
-            const redirectLink = document.getElementById('redirectLink_Normal').value.trim();
-            
-            // FETCHING ADVANCED FIELDS
-            const accessCode = document.getElementById('lifafaAccessCode_Normal').value.trim();
-            const specialUsers = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
-            
-            const requiredChannels = globalSettings.telegramChannels || []; // Use GLOBAL channels
+   // --- LIFAFA CREATION LOGIC (ALL TYPES) ---
+// ------------------------------------------
 
-            const youtubeLink = document.getElementById('lifafaYoutubeLink_Normal')?.value.trim();
-            const referCount = parseInt(document.getElementById('lifafaReferCount_Normal')?.value) || 0;
-            
-            const totalAmount = perUserAmount * count; 
-            const currentBalance = getBalance(senderUsername);
+document.querySelectorAll('.lifafa-form-new').forEach(form => {
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const lifafaType = form.dataset.type; // Get type from data-type attribute
+        
+        const perUserAmount = parseFloat(document.getElementById(`lifafaPerUserAmount_${lifafaType}`).value);
+        const count = parseInt(document.getElementById(`lifafaCount_${lifafaType}`).value);
+        const title = document.getElementById(`lifafaTitle_${lifafaType}`).value.trim();
+        const comment = document.getElementById(`paymentComment_${lifafaType}`).value.trim();
+        const redirectLink = document.getElementById(`redirectLink_${lifafaType}`).value.trim();
+        
+        // ADVANCED FIELDS 
+        const accessCode = document.getElementById('lifafaAccessCode_Normal').value.trim();
+        const rawSpecialUsers = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
+        
+        // CRITICAL FIX: Filter and get only valid 10-digit unique mobile numbers
+        const specialUsers = parseAndFilterNumbers(rawSpecialUsers); 
+        
+        const youtubeLink = document.getElementById('lifafaYoutubeLink_Normal')?.value.trim();
+        const referCount = parseInt(document.getElementById('lifafaReferCount_Normal')?.value) || 0;
+        const requiredChannels = globalSettings.telegramChannels || [];
 
-            // 1. Validation
-            if (!title) { appendLog('Error: Lifafa Title is required.', 'error'); return; }
-            if (isNaN(perUserAmount) || perUserAmount < 0.01) {
-                appendLog(`Error: Per user amount must be at least ₹0.01.`, 'error');
-                return;
-            }
-            if (isNaN(count) || count < 2) {
-                appendLog('Error: Minimum claims/users is 2.', 'error');
-                return;
-            }
-            if (totalAmount < MIN_LIFAFA_AMOUNT) {
-                 appendLog(`Error: Minimum Lifafa total amount is ₹${MIN_LIFAFA_AMOUNT}.`, 'error');
-                 return;
-            }
-            if (currentBalance < totalAmount) {
-                appendLog(`Error: Insufficient balance. Available: ₹${currentBalance.toFixed(2)}. Total Cost: ₹${totalAmount.toFixed(2)}`, 'error');
-                return;
-            }
+        // TYPE-SPECIFIC FIELDS
+        let typeSpecificData = {};
+        if (lifafaType === 'Scratch') {
+            const luckPercentage = parseInt(document.getElementById('percentageSlider_Scratch').value) || 100;
+            typeSpecificData.luckPercentage = luckPercentage;
+        }
 
-            // 2. Confirmation
-            if (!confirm(`Confirm creation of Lifafa worth ₹${totalAmount.toFixed(2)} for ${count} users?`)) {
-                return;
-            }
+        const totalAmount = perUserAmount * count; 
+        const currentBalance = getBalance(senderUsername);
 
-            // 3. Execution: Deduct and Create Lifafa Object
-            const newBalance = currentBalance - totalAmount;
-            setBalance(senderUsername, newBalance);
+        // 1. Validation
+        if (!title) { appendLog('Error: Lifafa Title is required.', 'error'); return; }
+        if (isNaN(perUserAmount) || perUserAmount < 0.01) {
+            appendLog(`Error: Per user amount must be at least ₹0.01.`, 'error');
+            return;
+        }
+        if (isNaN(count) || count < 2) {
+            appendLog('Error: Minimum claims/users is 2.', 'error');
+            return;
+        }
+        if (totalAmount < MIN_LIFAFA_AMOUNT) {
+             appendLog(`Error: Minimum Lifafa total amount is ₹${MIN_LIFAFA_AMOUNT}.`, 'error');
+             return;
+        }
+        if (currentBalance < totalAmount) {
+            appendLog(`Error: Insufficient balance. Available: ₹${currentBalance.toFixed(2)}. Total Cost: ₹${totalAmount.toFixed(2)}`, 'error');
+            return;
+        }
 
-            const uniqueId = senderUsername.slice(0, 3).toUpperCase() + Math.random().toString(36).substring(2, 9).toUpperCase() + Date.now().toString().slice(-4);
-            
-            const newLifafa = {
-                id: uniqueId,
-                creator: senderUsername,
-                date: Date.now(),
-                type: 'Normal',
-                title: title,
-                comment: comment,
-                redirectLink: redirectLink,
-                accessCode: accessCode || null,
-                specialUsers: specialUsers ? specialUsers.split(/[,*.\s\n]+/).filter(Boolean) : [],
-                requirements: {
-                    channels: requiredChannels, // Save the list of global required channels
-                    youtube: youtubeLink || null,
-                    referrals: referCount > 0 ? referCount : null,
-                },
-                totalAmount: totalAmount, 
-                count: count,
-                perClaim: perUserAmount, 
-                claims: [] 
-            };
+        // 2. Confirmation
+        if (!confirm(`Confirm creation of ${lifafaType} Lifafa worth ₹${totalAmount.toFixed(2)} for ${count} users?`)) {
+            return;
+        }
 
-            // 4. Save Lifafa & Log Transaction
-            let lifafas = loadLifafas();
-            lifafas.push(newLifafa);
-            saveLifafas(lifafas);
-            
-            let senderHistory = getHistory(senderUsername);
-            senderHistory.push({ date: Date.now(), type: 'debit', amount: totalAmount, txnId: 'LIFAFA_CREATED_' + uniqueId, note: `Created Normal Lifafa: ${title}` });
-            saveHistory(senderUsername, senderHistory);
+        // 3. Execution: Deduct and Create Lifafa Object
+        const newBalance = currentBalance - totalAmount;
+        setBalance(senderUsername, newBalance);
+
+        const uniqueId = senderUsername.slice(0, 3).toUpperCase() + Math.random().toString(36).substring(2, 9).toUpperCase() + Date.now().toString().slice(-4);
+        
+        const newLifafa = {
+            id: uniqueId,
+            creator: senderUsername,
+            date: Date.now(),
+            type: lifafaType, 
+            title: title,
+            comment: comment,
+            redirectLink: redirectLink,
+            accessCode: accessCode || null,
+            specialUsers: specialUsers, // Use the cleaned array
+            requirements: {
+                channels: requiredChannels,
+                youtube: youtubeLink || null,
+                referrals: referCount > 0 ? referCount : null,
+            },
+            ...typeSpecificData,
+            totalAmount: totalAmount, 
+            count: count,
+            perClaim: perUserAmount, 
+            claims: [] 
+        };
+
+        // 4. Save Lifafa & Log Transaction
+        let lifafas = loadLifafas();
+        lifafas.push(newLifafa);
+        saveLifafas(lifafas);
+        
+        let senderHistory = getHistory(senderUsername);
+        senderHistory.push({ date: Date.now(), type: 'debit', amount: totalAmount, txnId: `LIFAFA_CREATED_${lifafaType}_` + uniqueId, note: `Created ${lifafaType} Lifafa: ${title}` });
+        saveHistory(senderUsername, senderHistory);
 
 
-            // 5. Final UI Update
-            refreshBalanceUI();
-            renderLifafas();
-            appendLog(`SUCCESS: Lifafa created! Share link with ID: ${uniqueId}`, 'success');
-            
-            const linkMsg = document.createElement('p');
-            linkMsg.innerHTML = `<span style="color: #00e0ff; font-weight:bold;">Link:</span> ${window.location.origin}/claim.html?id=${uniqueId}`;
-            logArea.prepend(linkMsg);
-            
-            normalLifafaForm.reset();
-        });
-    }
+        // 5. Final UI Update
+        refreshBalanceUI();
+        renderLifafas();
+        appendLog(`SUCCESS: ${lifafaType} Lifafa created! Share link with ID: ${uniqueId}`, 'success');
+        
+        const linkMsg = document.createElement('p');
+        linkMsg.innerHTML = `<span style="color: #00e0ff; font-weight:bold;">Link:</span> ${window.location.origin}/claim.html?id=${uniqueId}`;
+        logArea.prepend(linkMsg);
+        
+        form.reset(); 
+    });
+});
 
     // Logout Button (For consistency)
     if(logoutBtn) {
