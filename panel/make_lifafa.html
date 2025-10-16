@@ -98,7 +98,42 @@
                     <button type="submit" class="submit-btn create-btn"><i class="ri-dice-3-line"></i> Create Dice
                         Lifafa</button>
                 </form>
-                <form id="tossLifafaForm" data-type="Toss" class="lifafa-form-new" style="display: none;"></form>
+                <form id="tossLifafaForm" data-type="Toss" class="lifafa-form-new" style="display: none;">
+                    <div class="form-group input-icon-group">
+                        <i class="ri-gift-line"></i>
+                        <input type="text" id="lifafaTitle_Toss" placeholder="Giveaway Title (Toss)" required>
+                    </div>
+                    <div class="form-group input-icon-group">
+                        <i class="ri-group-line"></i>
+                        <input type="number" id="lifafaCount_Toss" min="2" placeholder="Total Users (Min 2)" required>
+                    </div>
+                    <div class="form-group input-icon-group">
+                        <i class="ri-money-rupee-circle-line"></i>
+                        <input type="number" id="lifafaPerUserAmount_Toss" min="0.01" step="0.01"
+                            placeholder="Per User Amount (₹)" required>
+                    </div>
+
+                    <div class="form-group input-icon-group">
+                        <i class="ri-coin-line"></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <select id="lifafaTossSide_Toss" required
+                            style="width: 100%; border: none; background: transparent; color: white; font-size: 1rem;">
+                            <option style="background-color: black;" value="" disabled selected>Select Winning Side</option>
+                            <option style="background-color: black;" value="Heads">Heads</option>
+                            <option style="background-color: black;" value="Tails">Tails</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group input-icon-group">
+                        <i class="ri-message-3-line"></i>
+                        <input type="text" id="paymentComment_Toss" placeholder="Payment Comment" required>
+                    </div>
+                    <div class="form-group input-icon-group">
+                        <i class="ri-external-link-line"></i>
+                        <input type="url" id="redirectLink_Toss" placeholder="Redirect Link (Optional)">
+                    </div>
+                    <button type="submit" class="submit-btn create-btn"><i class="ri-coin-line"></i> Create Toss
+                        Lifafa</button>
+                </form>
                 <form id="scratchLifafaForm" data-type="Scratch" class="lifafa-form-new" style="display: none;"></form>
                 <br>
 
