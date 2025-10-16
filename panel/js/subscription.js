@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     // --- GLOBAL SETTINGS UTILITY (Remains the same) ---
     const DEFAULTS = { 
-        prices: {"1 Month": 59,"3 Months": 109,"6 Months": 159}
+        prices: {"1 Month": 129,"3 Months": 229,"6 Months": 329}
     };
     function loadSettings() {
         try {
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
                 const originalPriceElement = card.querySelector('.original-price');
                 if (originalPriceElement) {
-                    const defaultOriginal = planName === "1 Month" ? 99 : planName === "3 Months" ? 179 : 269;
+                    const defaultOriginal = planName === "1 Month" ? 129 : planName === "2 Months" ? 229 : planName === "3 Months" ? 329 : null;
                     const discount = Math.round(((defaultOriginal - newPrice) / defaultOriginal) * 100);
                     const saveTag = card.querySelector('.save-tag');
                     if (saveTag) saveTag.textContent = `Save ${discount}%`;
