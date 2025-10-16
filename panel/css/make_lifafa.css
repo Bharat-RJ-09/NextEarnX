@@ -124,19 +124,18 @@ body::before {
     align-items: center;
     position: relative;
     padding: 15px; 
-    border: 1px solid rgba(2, 238, 57, 0.987);
+    border: 1px solid rgba(132, 2, 238, 0.987);
     border-radius: 10px;
     margin-bottom: 12px;
     background: rgba(0,0,0,0.2);
 }
-.lifafa-form-new .input-icon-group:focus-within {
-    border-color: #00e0ff;
+.lifafa-form-new .input-icon-group:focus-within { 
     box-shadow: 0 0 5px rgba(0,224,255,0.5);
 }
 .lifafa-form-new .input-icon-group i {
-    position: absolute;
+    position: absolute; 
     left: 15px;
-    color: #fff; /* White icon */
+    color: #00fff2; /* White icon */
     font-size: 1.2rem;
     z-index: 2;
 }
@@ -145,7 +144,7 @@ body::before {
     padding: 0;
     border: none;
     background: transparent;
-    color: white;
+    color: white;  
     font-size: 1rem;
     padding-left: 35px; /* Adjust input padding for icon */
 }
