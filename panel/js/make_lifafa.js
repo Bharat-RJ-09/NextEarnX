@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Mock Check Button Listener (Special Users) - FIXED
+   // Mock Check Button Listener (Special Users) - FIXED
     document.querySelector('#specialUsersContent .check-btn')?.addEventListener('click', () => {
         const rawUsers = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
         const textarea = document.getElementById('lifafaSpecialUsers_Normal');
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
              return;
         }
         
-        // 1. Calculate total original entries (including duplicates and invalid)
+        // 1. Calculate total original entries
         const totalOriginalEntries = rawUsers.split(/[,*.\s\n]+/).filter(Boolean).length;
         
         // 2. Get the final cleaned list (unique and 10-digit only)
@@ -227,8 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const finalCount = validNumbers.length;
         const removedCount = totalOriginalEntries - finalCount;
         
-        // 3. Update textarea with only valid, unique numbers (separated by newline for readability)
-        textarea.value = validNumbers.join('\n');
+        // 3. Update textarea with valid, unique numbers, separated by a comma and a newline
+        // CRITICAL FIX: Join with ', \n' for visual comma and correct splitting later
+        textarea.value = validNumbers.join(',\n'); 
         
         if (finalCount === 0) {
             alert("❌ No valid 10-digit unique numbers found after filtering.");
