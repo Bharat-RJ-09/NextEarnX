@@ -1,4 +1,4 @@
-// panel/js/make_lifafa.js - Dedicated Lifafa Creation Logic (FINAL REFINED VERSION WITH DRAFTS)
+// panel/js/make_lifafa.js - Dedicated Lifafa Creation Logic (FINAL REFINED VERSION WITH DRAFTS)  
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -522,8 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
 
-    // ------------------------------------------
-    // --- LIFAFA CREATION LOGIC (ALL TYPES) ---
+   // --- LIFAFA CREATION LOGIC (ALL TYPES) ---
     // ------------------------------------------
 
     document.querySelectorAll('.lifafa-form-new').forEach(form => {
@@ -531,25 +530,33 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             
             const lifafaType = form.dataset.type; 
+
+            // Helper function for SAFE INPUT ACCESS (CRITICAL FIX)
+            const safeGetValue = (id, isNumber = false) => {
+                const input = document.getElementById(id);
+                if (!input) return isNumber ? 0 : '';
+                const value = input.value.trim();
+                return isNumber ? (parseFloat(value) || 0) : value;
+            };
             
-            const perUserAmount = parseFloat(document.getElementById(`lifafaPerUserAmount_${lifafaType}`).value);
-            const count = parseInt(document.getElementById(`lifafaCount_${lifafaType}`).value);
-            const title = document.getElementById(`lifafaTitle_${lifafaType}`).value.trim();
-            const comment = document.getElementById(`paymentComment_${lifafaType}`).value.trim();
-            const redirectLink = document.getElementById(`redirectLink_${lifafaType}`).value.trim();
+            const perUserAmount = safeGetValue(`lifafaPerUserAmount_${lifafaType}`, true);
+            const count = safeGetValue(`lifafaCount_${lifafaType}`, true);
+            const title = safeGetValue(`lifafaTitle_${lifafaType}`);
+            const comment = safeGetValue(`paymentComment_${lifafaType}`);
+            const redirectLink = safeGetValue(`redirectLink_${lifafaType}`);
             
-            // ADVANCED FIELDS 
-            const accessCode = document.getElementById('lifafaAccessCode_Normal').value.trim();
-            const rawSpecialUsers = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
+            // ADVANCED FIELDS (CRITICAL FIX: Using safeGetValue for accordion fields)
+            const accessCode = safeGetValue('lifafaAccessCode_Normal');
+            const rawSpecialUsers = safeGetValue('lifafaSpecialUsers_Normal');
             const specialUsers = parseAndFilterNumbers(rawSpecialUsers); 
             
-            const youtubeLink = youtubeLinkInput.value.trim();
+            const youtubeLink = youtubeLinkInput ? youtubeLinkInput.value.trim() : '';
             
-            // WATCH DURATION (from YouTube Check)
+            // WATCH DURATION (CRITICAL FIX: Only run complex validation if YouTube Link is present)
             let requiredWatchDuration = null;
             if (youtubeLink) {
                  if (youtubeVideoInfoContainer.style.display === 'none' || !watchDurationSlider.value) {
-                     alert("⚠️ Please click 'Check Video', verify the video, and set the watch duration.");
+                     alert("⚠️ YouTube Link found! Please click 'Check Video', verify the video, and set the watch duration.");
                      return;
                  }
                  const requiredMinutes = parseInt(watchDurationSlider.value) || 0;
@@ -561,11 +568,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // REFERRAL REWARD FIELDS
-            const referAmountInput = document.getElementById('lifafaReferAmount_Normal');
-            const referCommentInput = document.getElementById('lifafaReferComment_Normal');
-            
-            const referAmount = parseFloat(referAmountInput.value) || 0;
-            const referComment = referCommentInput.value.trim();
+            const referAmount = safeGetValue('lifafaReferAmount_Normal', true);
+            const referComment = safeGetValue('lifafaReferComment_Normal');
 
             if (referAmount > 0 && referAmount < 0.01) {
                 alert("⚠️ Refer Amount must be at least ₹0.01 if set.");
@@ -577,11 +581,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // TYPE-SPECIFIC FIELDS
             let typeSpecificData = {};
             if (lifafaType === 'Scratch') {
-                const luckPercentage = parseInt(document.getElementById('percentageSlider_Scratch').value) || 100;
+                const luckPercentage = safeGetValue('percentageSlider_Scratch', true) || 100;
                 typeSpecificData.luckPercentage = luckPercentage;
             } else if (lifafaType === 'Dice') {
-                const diceNumberInput = document.getElementById('lifafaDiceNumber_Dice');
-                const diceNumber = parseInt(diceNumberInput ? diceNumberInput.value : null);
+                const diceNumber = safeGetValue('lifafaDiceNumber_Dice', true);
                 
                 if (isNaN(diceNumber) || diceNumber < 1 || diceNumber > 6) {
                     alert("⚠️ Dice Lifafa requires a valid Winning Dice Number between 1 and 6.");
@@ -590,8 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 typeSpecificData.winningDice = diceNumber;
             } else if (lifafaType === 'Toss') {
-                const tossSideInput = document.getElementById('lifafaTossSide_Toss');
-                const tossSide = tossSideInput ? tossSideInput.value : '';
+                const tossSide = safeGetValue('lifafaTossSide_Toss');
                 
                 if (!tossSide || (tossSide !== 'Heads' && tossSide !== 'Tails')) {
                     alert("⚠️ Toss Lifafa requires a valid Winning Side (Heads or Tails).");
@@ -619,6 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  return;
             }
             if (currentBalance < totalAmount) {
+                alert(`Error: Insufficient balance. Available: ₹${currentBalance.toFixed(2)}. Total Cost: ₹${totalAmount.toFixed(2)}`);
                 appendLog(`Error: Insufficient balance. Available: ₹${currentBalance.toFixed(2)}. Total Cost: ₹${totalAmount.toFixed(2)}`, 'error');
                 return;
             }
@@ -680,10 +683,16 @@ document.addEventListener('DOMContentLoaded', () => {
             logArea.prepend(linkMsg);
             
             form.reset(); 
-            youtubeLinkInput.value = ''; 
-            youtubeVideoInfoContainer.style.display = 'none';
-            if (referAmountInput) referAmountInput.value = ''; 
-            if (referCommentInput) referCommentInput.value = '';
+            // Reset common/accordion fields after success
+            if (youtubeLinkInput) youtubeLinkInput.value = ''; 
+            if (youtubeVideoInfoContainer) youtubeVideoInfoContainer.style.display = 'none';
+            if (document.getElementById('lifafaAccessCode_Normal')) document.getElementById('lifafaAccessCode_Normal').value = '';
+            if (document.getElementById('lifafaSpecialUsers_Normal')) document.getElementById('lifafaSpecialUsers_Normal').value = '';
+            if (document.getElementById('lifafaReferAmount_Normal')) document.getElementById('lifafaReferAmount_Normal').value = ''; 
+            if (document.getElementById('lifafaReferComment_Normal')) document.getElementById('lifafaReferComment_Normal').value = '';
+            // Reset scratch slider text
+            if (sliderValueDisplay) sliderValueDisplay.textContent = '100% Luck';
+
 
             // Clean up current auto-save draft
             const draftKeyToDelete = senderUsername + '-' + lifafaType;
