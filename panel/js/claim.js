@@ -1,4 +1,4 @@
-// panel/js/claim.js - Lifafa Claim Logic with FULL Validation and Types (VIDEO MATCH LOGIC)
+// panel/js/claim.js - Lifafa Claim Logic with FULL Validation and Types (FINAL)
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -12,9 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const lifafaTitleDisplay = document.getElementById('lifafaTitle');
     const claimAmountDisplay = document.getElementById('claimAmountDisplay');
     const initialClaimAmount = document.getElementById('initialClaimAmount');
-    const claimCountDisplay = document.getElementById('claimCountDisplay');
-    const mobileForm = document.getElementById('mobileForm');
+    
+    // ADDED: Lifafa Stats Elements
+    const creatorUsernameDisplay = document.getElementById('creatorUsername');
+    const lifafaTypeDisplay = document.getElementById('lifafaTypeDisplay');
+    const claimCountDisplay = document.getElementById('claimCountDisplay'); 
+
     const claimMobileInput = document.getElementById('claimMobileInput');
+    const mobileForm = document.getElementById('mobileForm');
     const claimDetailsContainer = document.getElementById('claimDetailsContainer');
     const specialLifafaInterface = document.getElementById('specialLifafaInterface');
 
@@ -123,10 +128,12 @@ document.addEventListener('DOMContentLoaded', () => {
              return false;
         }
         
-        // Update basic UI details
+        // Update Lifafa stats UI immediately
         lifafaTitleDisplay.textContent = lifafaData.title;
         claimAmountDisplay.textContent = `₹${lifafaData.perClaim.toFixed(2)}`;
         initialClaimAmount.textContent = `₹${lifafaData.perClaim.toFixed(2)}`;
+        lifafaTypeDisplay.textContent = lifafaData.type;
+        claimCountDisplay.textContent = `${lifafaData.claims.length}/${lifafaData.count}`;
 
         // Proceed to show the mobile input form
         loadingState.style.display = 'none';
@@ -139,8 +146,14 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const mobile = claimMobileInput.value.trim();
+        const mobileRegex = /^\d{10}$/;
+
+        if (!mobileRegex.test(mobile)) {
+             alert("Please enter a valid 10-digit number.");
+             return;
+        }
+
         const users = loadUsers();
-        
         const userFound = users.find(user => user.mobile === mobile);
 
         if (!userFound) {
@@ -196,8 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
             && claimChecksPassed.telegram
             && claimChecksPassed.youtube;
             
-        // Check if Special Lifafa Interface needs manual interaction
-        const specialInterfaceNeedsInteraction = document.querySelector('#specialLifafaInterface button:not([disabled])');
+        // Check if Special Lifafa Interface needs manual interaction (button is visible and not disabled)
+        const specialInterfaceNeedsInteraction = document.querySelector('#specialLifafaInterface button[disabled="false"]');
         
         if (allMandatoryChecksPass && !specialInterfaceNeedsInteraction) {
             finalClaimBtn.disabled = false;
@@ -308,11 +321,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (gameStatus === 'won') {
              specialLifafaInterface.innerHTML = `<p style="color:#aaffaa; font-weight:bold;">✅ ${type} Game Won! Proceed to Claim.</p>`;
-             finalClaimBtn.disabled = false;
+             updateClaimButtonStatus();
              return;
         } else if (gameStatus === 'lost') {
              specialLifafaInterface.innerHTML = `<p style="color:#ff0077; font-weight:bold;">❌ ${type} Game Lost. You cannot claim this Lifafa now.</p>`;
-             finalClaimBtn.disabled = true;
+             updateClaimButtonStatus();
              return;
         }
 
@@ -324,19 +337,31 @@ document.addEventListener('DOMContentLoaded', () => {
             content = `<p class="note-msg" style="color:#00e0ff; font-weight:bold;">🪙 Toss a coin! Winning side: ${lifafaData.winningSide}.</p>`;
             buttonText = 'Toss Coin to Claim';
         } else if (type === 'Scratch') {
-            content = `<p class="note-msg" style="color:#00e0ff; font-weight:bold;">✨ Scratch to win! Luck: ${lifafaData.luckPercentage}%. (One try only)</p>`;
+            content = `<p class="note-msg" style="color:#00e0ff; font-weight:bold;">✨ Scratch to win! Luck: ${lifafaData.luckPercentage}%.</p>`;
             buttonText = 'Scratch Card to Claim';
         }
         
         if (content) {
             specialLifafaInterface.innerHTML = `
                 ${content}
-                <button id="${buttonId}" class="submit-btn claim-btn" style="background:#ffcc00; color:#1a1a2a; margin-bottom: 15px;">
+                <button id="${buttonId}" class="submit-btn claim-btn" style="background:#ffcc00; color:#1a1a2a; margin-bottom: 15px;" disabled>
                     <i class="ri-play-line"></i> ${buttonText}
                 </button>
             `;
             // Attach special claim handler
-            document.getElementById(buttonId).addEventListener('click', () => handleSpecialLifafaClaim(type, buttonId));
+            const specialBtn = document.getElementById(buttonId);
+            specialBtn.addEventListener('click', () => handleSpecialLifafaClaim(type, buttonId));
+            
+            // Re-enable the button if general requirements are met
+            const allMandatoryChecksPass = claimChecksPassed.ban
+                && claimChecksPassed.specialUser
+                && claimChecksPassed.code
+                && claimChecksPassed.telegram
+                && claimChecksPassed.youtube;
+
+            if (allMandatoryChecksPass) {
+                 specialBtn.disabled = false;
+            }
             finalClaimBtn.disabled = true; // Keep main button disabled until game won
         }
     }
@@ -474,7 +499,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- INITIALIZE ---
     if (loadInitialData()) {
-        // Only run checkAllRequirements after mobile verification is complete
-        // The check is now triggered by the mobileForm submit event
+        // Initialization complete. The flow proceeds via mobileForm submission.
     }
-});
+}); 
+
+finalStatusMessage
