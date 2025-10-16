@@ -430,3 +430,39 @@ body::before {
     cursor: pointer;
     transition: background 0.2s;
 }
+
+/* panel/css/make_lifafa.css: NEW BLOCK (Add this at the very end of the file) */
+
+/* --- YOUTUBE SLIDER STYLES (Theme-appropriate design) --- */
+
+#watchDurationSlider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    outline: none;
+    transition: opacity .2s;
+}
+
+#watchDurationSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #FF0077; /* Neon Pink Thumb */
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(255,0,119,0.8);
+    border: 2px solid #1a1a2a;
+}
+
+#watchDurationSlider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #FF0077;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(255,0,119,0.8);
+    border: 2px solid #1a1a2a;
+}

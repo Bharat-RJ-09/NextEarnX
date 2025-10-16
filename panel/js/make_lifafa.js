@@ -1,52 +1,54 @@
 // panel/js/make_lifafa.js - Dedicated Lifafa Creation Logic (UPDATED FOR GLOBAL TELEGRAM)
 
 document.addEventListener('DOMContentLoaded', () => {
-    
-    const SETTINGS_KEY = 'nextEarnXGlobalSettings'; // Define settings key
+
+    const activeLifafasList = document.getElementById('activeLifafasList');
 
     // NEW YOUTUBE ELEMENTS
     const checkYoutubeVideoBtn = document.getElementById('checkYoutubeVideoBtn');
     const youtubeLinkInput = document.getElementById('lifafaYoutubeLink_Normal');
-    const youtubeDurationControl = document.getElementById('youtubeDurationControl');
+    const youtubeVideoInfoContainer = document.getElementById('youtubeVideoInfoContainer');
+    const videoThumbnail = document.getElementById('videoThumbnail');
+    const videoTitleDisplay = document.getElementById('videoTitle');
+    const videoTotalDurationDisplay = document.getElementById('videoTotalDurationDisplay');
     const watchDurationSlider = document.getElementById('watchDurationSlider');
     const watchDurationDisplay = document.getElementById('watchDurationDisplay');
-    const videoTotalDurationDisplay = document.getElementById('videoTotalDuration');
-    
+
     let videoDurationSeconds = 0; // Stores the mock duration in seconds of the YouTube video
 
     // --- ELEMENTS ---
 
-    
+
     // UI Elements
-    const currentBalanceDisplay = document.getElementById('currentBalanceDisplay'); 
+    const currentBalanceDisplay = document.getElementById('currentBalanceDisplay');
     const logArea = document.getElementById('logArea');
     const logoutBtn = document.getElementById('logoutBtn');
     const currentChannelCountDisplay = document.getElementById('currentChannelCount'); // ADDED
-    
+
     // Lifafa Form Elements (Normal Lifafa is the default for submission)
     const normalLifafaForm = document.getElementById('normalLifafaForm');
-    const lifafaCountInput = document.getElementById('lifafaCount_Normal'); 
+    const lifafaCountInput = document.getElementById('lifafaCount_Normal');
     const lifafaPerUserAmountInput = document.getElementById('lifafaPerUserAmount_Normal');
     const activeLifafasList = document.getElementById('activeLifafasList');
 
     // LIFAFA LIMITS
     const MIN_LIFAFA_AMOUNT = 10;
-    const LIFAFA_STORAGE_KEY = 'nextEarnXLifafas'; 
-    
+    const LIFAFA_STORAGE_KEY = 'nextEarnXLifafas';
+
     // CRITICAL: Global Balance and History Keys
-    const GLOBAL_BALANCE_KEY = 'nextEarnXBalance'; 
-    const GLOBAL_HISTORY_KEY = 'nextEarnXHistory'; 
+    const GLOBAL_BALANCE_KEY = 'nextEarnXBalance';
+    const GLOBAL_HISTORY_KEY = 'nextEarnXHistory';
     const USER_STORAGE_KEY = 'nextEarnXUsers';
 
     let senderUsername = '';
     let globalSettings = {}; // ADDED Global Settings container
 
     // --- UTILITIES ---
-    
+
     function getCurrentUserSession() {
         try {
             const user = JSON.parse(localStorage.getItem('nextEarnXCurrentUser'));
-            senderUsername = user ? user.username : ''; 
+            senderUsername = user ? user.username : '';
         } catch { return null; }
     }
 
@@ -56,23 +58,60 @@ document.addEventListener('DOMContentLoaded', () => {
         p.style.color = type === 'success' ? '#aaffaa' : type === 'error' ? '#ffaaaa' : '#e0e0e0';
         logArea.prepend(p);
     }
-    
+
     // NEW UTILITY: Parse and Filter Numbers (FIXED)
     function parseAndFilterNumbers(rawText) {
         if (!rawText) return [];
-        
+
         // 1. Split by all recognized separators (comma, asterisk, period, space, or newline)
         const potentialNumbers = rawText.split(/[,*.\s\n]+/).filter(Boolean);
-        
+
         // 2. Filter for valid 10-digit numeric strings (CRITICAL: /^\d{10}$/ regex ensures 10 digits only)
-        const validNumbers = potentialNumbers.filter(n => 
+        const validNumbers = potentialNumbers.filter(n =>
             /^\d{10}$/.test(n.trim())
         );
-        
+
         // 3. Return only unique numbers using a Set, and convert back to an Array.
         return Array.from(new Set(validNumbers));
     }
-    
+
+    // panel/js/make_lifafa.js: NEW UTILITY (Insert after parseAndFilterNumbers)
+
+    // Utility to parse YouTube ID (Mock helper)
+    function getYoutubeId(url) {
+        const regex = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    }
+
+    // Utility to format seconds to M:SS or H:MM:SS
+    function formatTime(totalSeconds) {
+        if (isNaN(totalSeconds) || totalSeconds < 0) return "0:00";
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = Math.floor(totalSeconds % 60);
+
+        let result = "";
+        if (hours > 0) result += `${hours}:`;
+        result += `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        return result;
+    }
+
+    // MOCK: Fetch Video Info (Simulates API call for thumbnail, title, and duration)
+    function fetchYoutubeInfo(videoId) {
+        if (!videoId) return null;
+
+        // Mock duration in seconds (4 minutes (240s) to 15 minutes (900s))
+        const mockDuration = Math.floor(Math.random() * (900 - 240 + 1)) + 240;
+
+        // Mock data. Thumbnails are fetched from standard YouTube path.
+        return {
+            title: `NextEarnX Promotion - New Lifafa Feature!`, // Mocked Title
+            thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+            durationSeconds: mockDuration
+        };
+    }
+
     // ADDED: Load Global Settings
     function loadGlobalSettings() {
         try {
@@ -87,9 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (username === senderUsername) {
             return parseFloat(localStorage.getItem(GLOBAL_BALANCE_KEY) || '0.00');
         }
-        return parseFloat(localStorage.getItem(`nextEarnXBalance_${username}`) || '0.00'); 
+        return parseFloat(localStorage.getItem(`nextEarnXBalance_${username}`) || '0.00');
     }
-    
+
     function setBalance(username, balance) {
         if (username === senderUsername) {
             localStorage.setItem(GLOBAL_BALANCE_KEY, balance.toFixed(2));
@@ -97,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         localStorage.setItem(`nextEarnXBalance_${username}`, balance.toFixed(2));
     }
-    
+
     function getHistory(username) {
         const key = (username === senderUsername) ? GLOBAL_HISTORY_KEY : `nextEarnXHistory_${username}`;
         try { return JSON.parse(localStorage.getItem(key) || '[]'); }
@@ -108,20 +147,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const key = (username === senderUsername) ? GLOBAL_HISTORY_KEY : `nextEarnXHistory_${username}`;
         localStorage.setItem(key, JSON.stringify(history));
     }
-    
+
     function loadLifafas() {
         try { return JSON.parse(localStorage.getItem(LIFAFA_STORAGE_KEY) || "[]"); }
         catch { return []; }
     }
-    
+
     function saveLifafas(lifafas) {
         localStorage.setItem(LIFAFA_STORAGE_KEY, JSON.stringify(lifafas));
     }
-    
+
     function refreshBalanceUI() {
-        const currentBalance = getBalance(senderUsername); 
+        const currentBalance = getBalance(senderUsername);
         currentBalanceDisplay.textContent = `₹${currentBalance.toFixed(2)}`;
     }
+
+
 
     function appendLog(message, type = 'info') {
         const p = document.createElement('p');
@@ -129,28 +170,28 @@ document.addEventListener('DOMContentLoaded', () => {
         p.style.color = type === 'success' ? '#aaffaa' : type === 'error' ? '#ffaaaa' : '#e0e0e0';
         logArea.prepend(p);
     }
-    
+
     // ADDED: Update Telegram Channel Status on UI
     function updateTelegramStatusUI() {
         const channels = globalSettings.telegramChannels || [];
         const count = channels.length;
-        
+
         if (currentChannelCountDisplay) {
             if (count > 0) {
-                 currentChannelCountDisplay.textContent = `(Currently ${count} channel(s) are required globally)`;
-                 currentChannelCountDisplay.style.color = '#aaffaa';
+                currentChannelCountDisplay.textContent = `(Currently ${count} channel(s) are required globally)`;
+                currentChannelCountDisplay.style.color = '#aaffaa';
             } else {
-                 currentChannelCountDisplay.textContent = `(No channels required yet. Click 'Manage Channels' to add.)`;
-                 currentChannelCountDisplay.style.color = '#ffcc00';
+                currentChannelCountDisplay.textContent = `(No channels required yet. Click 'Manage Channels' to add.)`;
+                currentChannelCountDisplay.style.color = '#ffcc00';
             }
         }
     }
-    
+
     // --- LIFAFA LIST RENDERING ---
     function renderLifafas() {
         const lifafas = loadLifafas().filter(l => l.creator === senderUsername);
         activeLifafasList.innerHTML = '';
-        
+
         if (lifafas.length === 0) {
             activeLifafasList.innerHTML = '<p>No active giveaways.</p>';
             return;
@@ -159,10 +200,10 @@ document.addEventListener('DOMContentLoaded', () => {
         lifafas.forEach(l => {
             const item = document.createElement('div');
             item.classList.add('lifafa-item');
-            
+
             const claimedCount = l.claims.length;
             const statusText = (claimedCount === l.count) ? 'CLOSED' : `${claimedCount}/${l.count} Claimed`;
-            
+
             const totalAmount = l.perClaim * l.count;
 
             item.innerHTML = `
@@ -173,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p style="color:#777; font-size:11px;">Created: ${new Date(l.date).toLocaleString()}</p>
             `;
             activeLifafasList.appendChild(item);
-            
+
             // Attach copy listener
             item.querySelector('.link').addEventListener('click', (e) => {
                 const linkToCopy = e.target.dataset.link;
@@ -185,35 +226,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // panel/js/make_lifafa.js: REPLACEMENT BLOCK (Add this after the secondary tab switching logic, around line 200)
 
-    // --- YOUTUBE DURATION LOGIC ---
+    // panel/js/make_lifafa.js: REPLACEMENT BLOCK for YouTube Check Logic (Around line 200, before // --- LIFAFA CREATION LOGIC)
 
-    // 1. Check Video Button Handler (Mock Duration Fetch)
+
+
+    // --- YOUTUBE CHECK AND SLIDER LOGIC (FINAL) ---
+
+    // 1. Check Video Button Handler
     if (checkYoutubeVideoBtn) {
         checkYoutubeVideoBtn.addEventListener('click', () => {
             const link = youtubeLinkInput.value.trim();
-            youtubeDurationControl.style.display = 'none';
+            youtubeVideoInfoContainer.style.display = 'none';
 
-            if (!link || !link.startsWith('http')) {
-                alert("❌ Please enter a valid YouTube link.");
+            const videoId = getYoutubeId(link);
+
+            if (!link || !videoId) {
+                alert("❌ Please enter a valid YouTube video URL.");
                 return;
             }
 
-            // MOCK LOGIC: Simulate fetching video duration (3 to 10 minutes)
-            const minTime = 180; // 3 minutes
-            const maxTime = 600; // 10 minutes
-            videoDurationSeconds = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+            const videoInfo = fetchYoutubeInfo(videoId);
+            if (!videoInfo) return; // Should not happen with mock
+
+            videoDurationSeconds = videoInfo.durationSeconds;
+            // Get total minutes, rounded up (e.g., 5 min 1 sec becomes 6 min)
             const totalMinutes = Math.ceil(videoDurationSeconds / 60);
 
-            // Update UI with max duration
+            if (totalMinutes < 1) {
+                alert("❌ Video length is too short to track. (Mock: < 1 minute)");
+                return;
+            }
+
+            // Update UI with video details
+            videoThumbnail.src = videoInfo.thumbnailUrl;
+            videoThumbnail.style.display = 'block';
+            videoTitleDisplay.textContent = videoInfo.title;
+            videoTotalDurationDisplay.textContent = formatTime(videoDurationSeconds);
+
+            // Update Slider: Max value is total minutes
             watchDurationSlider.max = totalMinutes;
             watchDurationSlider.value = totalMinutes; // Default to max
-            videoTotalDurationDisplay.textContent = `${totalMinutes} min`;
 
-            // Display control and update initial watch time display
-            youtubeDurationControl.style.display = 'block';
+            // Update Duration Displays
             watchDurationDisplay.textContent = `${totalMinutes} min`;
 
-            appendLog(`Video link verified (MOCK). Max duration: ${totalMinutes} minutes.`, 'info');
+            // Show Container
+            youtubeVideoInfoContainer.style.display = 'block';
+
+            appendLog(`Video data retrieved. Total length: ${formatTime(videoDurationSeconds)}.`, 'success');
+        });
+    }
+
+    // 2. Slider Input Handler
+    if (watchDurationSlider) {
+        watchDurationSlider.addEventListener('input', (e) => {
+            const minutes = e.target.value;
+            // Update display to show required watch time in minutes
+            watchDurationDisplay.textContent = `${minutes} min`;
         });
     }
 
@@ -223,24 +292,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const minutes = e.target.value;
             watchDurationDisplay.textContent = `${minutes} min`;
         });
-    } 
+    }
 
 
     // --- INITIALIZE & TAB SWITCHING LOGIC ---
-    getCurrentUserSession(); 
+    getCurrentUserSession();
     loadGlobalSettings(); // CALL HERE
     refreshBalanceUI();
     renderLifafas();
     updateTelegramStatusUI(); // CALL HERE
- 
-   // --- ACCORDION TOGGLE LOGIC (FIXED FOR RELIABLE EXCLUSIVE ANIMATION) ---
+
+    // --- ACCORDION TOGGLE LOGIC (FIXED FOR RELIABLE EXCLUSIVE ANIMATION) ---
     const allHeaders = document.querySelectorAll('.accordion-header');
-    
+
     allHeaders.forEach(header => {
         header.addEventListener('click', () => {
             const targetId = header.dataset.target;
             const content = document.getElementById(targetId);
-            
+
             if (content) {
                 // Check if the clicked accordion is currently active
                 const wasActive = header.classList.contains('active');
@@ -253,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (otherContent) otherContent.classList.remove('active');
                     }
                 });
-                
+
                 // 2. If the clicked accordion was NOT active (i.e., we want to open it now)
                 if (!wasActive) {
                     header.classList.add('active');
@@ -264,35 +333,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-   // Mock Check Button Listener (Special Users) - FIXED
+    // Mock Check Button Listener (Special Users) - FIXED
     document.querySelector('#specialUsersContent .check-btn')?.addEventListener('click', () => {
         const rawUsers = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
         const textarea = document.getElementById('lifafaSpecialUsers_Normal');
 
         if (!rawUsers) {
-             alert('Enter mobile numbers first!');
-             return;
+            alert('Enter mobile numbers first!');
+            return;
         }
-        
+
         // 1. Calculate total original entries
         const totalOriginalEntries = rawUsers.split(/[,*.\s\n]+/).filter(Boolean).length;
-        
+
         // 2. Get the final cleaned list (unique and 10-digit only)
         const validNumbers = parseAndFilterNumbers(rawUsers);
-        
+
         const finalCount = validNumbers.length;
         const removedCount = totalOriginalEntries - finalCount;
-        
+
         // 3. Update textarea with valid, unique numbers, separated by a comma and a newline
         // CRITICAL FIX: Join with ', \n' for visual comma and correct splitting later
-        textarea.value = validNumbers.join(',\n'); 
-        
+        textarea.value = validNumbers.join(',\n');
+
         if (finalCount === 0) {
             alert("❌ No valid 10-digit unique numbers found after filtering.");
             appendLog('Error: No valid 10-digit numbers found.', 'error');
         } else {
-             alert(`✅ Filtered and kept ${finalCount} valid 10-digit numbers. Removed ${removedCount} invalid entries/duplicates.`);
-             appendLog(`Filtered: ${finalCount} valid numbers found for Special Users. Removed: ${removedCount}.`, 'success');
+            alert(`✅ Filtered and kept ${finalCount} valid 10-digit numbers. Removed ${removedCount} invalid entries/duplicates.`);
+            appendLog(`Filtered: ${finalCount} valid numbers found for Special Users. Removed: ${removedCount}.`, 'success');
         }
     });
 
@@ -302,18 +371,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const type = btn.dataset.lifafaType;
             document.querySelectorAll('.lifafa-tab-secondary').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.lifafa-form-new').forEach(f => f.style.display = 'none');
-            
+
             btn.classList.add('active');
             document.getElementById(`${type.toLowerCase()}LifafaForm`).style.display = 'block';
             logArea.innerHTML = `<p>Ready to create ${type} Lifafa...</p>`;
-            
-            e.stopPropagation(); 
+
+            e.stopPropagation();
         });
     });
 
     // ------------------------------------------
-     
- // panel/js/make_lifafa.js: REPLACEMENT BLOCK for the LIFAFA CREATION LOGIC section
+
+    // panel/js/make_lifafa.js: REPLACEMENT BLOCK for the LIFAFA CREATION LOGIC section
+
+   // panel/js/make_lifafa.js: REPLACEMENT BLOCK for the LIFAFA CREATION LOGIC section (Final version with Watch Duration)
 
 // ------------------------------------------
 // --- LIFAFA CREATION LOGIC (ALL TYPES) ---
@@ -334,20 +405,24 @@ document.querySelectorAll('.lifafa-form-new').forEach(form => {
         // ADVANCED FIELDS 
         const accessCode = document.getElementById('lifafaAccessCode_Normal').value.trim();
         const rawSpecialUsers = document.getElementById('lifafaSpecialUsers_Normal').value.trim();
-        
         const specialUsers = parseAndFilterNumbers(rawSpecialUsers); 
         
         const youtubeLink = youtubeLinkInput.value.trim();
         
         // NEW: Get required watch duration in seconds
-        let watchDurationSeconds = 0;
-        if (youtubeLink && youtubeDurationControl.style.display !== 'none') {
+        let requiredWatchDuration = null;
+        if (youtubeLink) {
+             if (youtubeVideoInfoContainer.style.display === 'none' || !watchDurationSlider.value) {
+                 alert("⚠️ Please click 'Check Video', verify the video, and set the watch duration.");
+                 return;
+             }
+             // Watch duration is the selected minutes on the slider converted to seconds
              const requiredMinutes = parseInt(watchDurationSlider.value) || 0;
-             watchDurationSeconds = requiredMinutes * 60;
-        } else if (youtubeLink) {
-             // If link is provided but check wasn't run, alert the user or default to a small value (let's enforce check)
-             alert("⚠️ Please click 'Check Video' and set the watch duration before creating Lifafa with a YouTube link.");
-             return;
+             requiredWatchDuration = requiredMinutes * 60;
+             if (requiredWatchDuration === 0) {
+                 alert("⚠️ Required watch time cannot be 0 minutes. Please adjust the slider.");
+                 return;
+             }
         }
         
         const referCount = parseInt(document.getElementById('lifafaReferCount_Normal')?.value) || 0;
@@ -355,13 +430,37 @@ document.querySelectorAll('.lifafa-form-new').forEach(form => {
 
         // TYPE-SPECIFIC FIELDS
         let typeSpecificData = {};
-// ... (rest of the logic remains the same)
-        
-        // 1. Validation (Same as before)
-// ... (Validation code) ...
+        if (lifafaType === 'Scratch') {
+            const luckPercentage = parseInt(document.getElementById('percentageSlider_Scratch').value) || 100;
+            typeSpecificData.luckPercentage = luckPercentage;
+        }
 
-        // 2. Confirmation (Same as before)
-// ... (Confirmation code) ...
+        const totalAmount = perUserAmount * count; 
+        const currentBalance = getBalance(senderUsername);
+
+        // 1. Validation
+        if (!title) { appendLog('Error: Lifafa Title is required.', 'error'); return; }
+        if (isNaN(perUserAmount) || perUserAmount < 0.01) {
+            appendLog(`Error: Per user amount must be at least ₹0.01.`, 'error');
+            return;
+        }
+        if (isNaN(count) || count < 2) {
+            appendLog('Error: Minimum claims/users is 2.', 'error');
+            return;
+        }
+        if (totalAmount < MIN_LIFAFA_AMOUNT) {
+             appendLog(`Error: Minimum Lifafa total amount is ₹${MIN_LIFAFA_AMOUNT}.`, 'error');
+             return;
+        }
+        if (currentBalance < totalAmount) {
+            appendLog(`Error: Insufficient balance. Available: ₹${currentBalance.toFixed(2)}. Total Cost: ₹${totalAmount.toFixed(2)}`, 'error');
+            return;
+        }
+
+        // 2. Confirmation
+        if (!confirm(`Confirm creation of ${lifafaType} Lifafa worth ₹${totalAmount.toFixed(2)} for ${count} users?`)) {
+            return;
+        }
 
         // 3. Execution: Deduct and Create Lifafa Object
         const newBalance = currentBalance - totalAmount;
@@ -382,7 +481,7 @@ document.querySelectorAll('.lifafa-form-new').forEach(form => {
             requirements: {
                 channels: requiredChannels,
                 youtube: youtubeLink || null,
-                watchDuration: watchDurationSeconds > 0 ? watchDurationSeconds : null, // NEW: Save duration
+                watchDuration: requiredWatchDuration, // FINAL VALUE
                 referrals: referCount > 0 ? referCount : null,
             },
             ...typeSpecificData,
@@ -392,24 +491,39 @@ document.querySelectorAll('.lifafa-form-new').forEach(form => {
             claims: [] 
         };
 
-        // 4. Save Lifafa & Log Transaction (Same as before)
-// ... (Save and Log code) ...
+        // 4. Save Lifafa & Log Transaction
+        let lifafas = loadLifafas();
+        lifafas.push(newLifafa);
+        saveLifafas(lifafas);
+        
+        let senderHistory = getHistory(senderUsername);
+        senderHistory.push({ date: Date.now(), type: 'debit', amount: totalAmount, txnId: `LIFAFA_CREATED_${lifafaType}_` + uniqueId, note: `Created ${lifafaType} Lifafa: ${title}` });
+        saveHistory(senderUsername, senderHistory);
 
-        // 5. Final UI Update (Same as before)
-// ... (Final UI Update code) ...
+
+        // 5. Final UI Update
+        refreshBalanceUI();
+        renderLifafas();
+        appendLog(`SUCCESS: ${lifafaType} Lifafa created! Share link with ID: ${uniqueId}`, 'success');
+        
+        const linkMsg = document.createElement('p');
+        linkMsg.innerHTML = `<span style="color: #00e0ff; font-weight:bold;">Link:</span> ${window.location.origin}/claim.html?id=${uniqueId}`;
+        logArea.prepend(linkMsg);
+        
+        form.reset(); 
     });
 });
 
-// ... (rest of the file follows, including the fixed accordion logic)
+    // ... (rest of the file follows, including the fixed accordion logic)
 
-// Logout Button (For consistency) - moved outside submit handler so it attaches once on load
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('session');
-        localStorage.removeItem('nextEarnXCurrentUser');
-        alert("Logged out from NextEarnX!");
-        window.location.href = 'login.html';
-    });
-}
+    // Logout Button (For consistency) - moved outside submit handler so it attaches once on load
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('session');
+            localStorage.removeItem('nextEarnXCurrentUser');
+            alert("Logged out from NextEarnX!");
+            window.location.href = 'login.html';
+        });
+    }
 
 }); // end DOMContentLoaded
