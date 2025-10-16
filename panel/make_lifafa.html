@@ -64,9 +64,7 @@
                         <i class="ri-external-link-line"></i>
                         <input type="url" id="redirectLink_Normal" placeholder="Redirect Link (Optional)">
                     </div>
-
-                    <button type="submit" class="submit-btn create-btn"><i class="ri-coupon-line"></i> Create Normal
-                        Lifafa</button>
+ 
                 </form>
                 <form id="diceLifafaForm" data-type="Dice" class="lifafa-form-new" style="display: none;"></form>
                 <form id="tossLifafaForm" data-type="Toss" class="lifafa-form-new" style="display: none;"></form>
@@ -142,7 +140,7 @@
                     </div>
 
                     <button type="button" id="checkYoutubeVideoBtn" class="action-btn check-btn"
-                        style="margin-top: 5px; background: #FF0077;"><i class="ri-search-line"></i> Check
+                        style="margin-top: 5px; background: #000000; font-weight: 550; color: white;"><i class="ri-search-line"></i> Check
                         Video</button>
 
                     <div id="youtubeVideoInfoContainer"
@@ -175,13 +173,26 @@
                     <i class="ri-arrow-down-s-line arrow-icon"></i>
                 </div> <br>
                 <div class="accordion-content" id="referEarnContent">
-                    <p class="mock-info" style="color:#ffcc00;">Future Feature: User must refer X new users to claim.
+                    <p class="mock-info" style="color:#aaffaa; margin-bottom:10px;">
+                        Optional: Set a reward amount. User will get this extra amount for every new active user they
+                        refer to claim this Lifafa.
                     </p>
+
                     <div class="form-group input-icon-group">
-                        <i class="ri-group-line"></i>
-                        <input type="number" id="lifafaReferCount_Normal" min="1"
-                            placeholder="Minimum Referrals Required (Optional)">
+                        <i class="ri-money-rupee-circle-line"></i>
+                        <input type="number" id="lifafaReferAmount_Normal" min="0.01" step="0.01"
+                            placeholder="Refer Amount (Extra reward per referral)">
                     </div>
+
+                    <div class="form-group input-icon-group">
+                        <i class="ri-message-3-line"></i>
+                        <input type="text" id="lifafaReferComment_Normal"
+                            placeholder="Refer Comment (Optional, e.g., 'Extra bonus!')">
+                    </div>
+
+                    <p class="mock-info" style="color:#ffcc00; font-size: 0.85rem;">
+                        Note: If set, the total cost for this Lifafa will increase based on successful referrals.
+                    </p>
                 </div>
 
 

@@ -25,17 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const youtubeVerifyBtn = document.getElementById('youtubeVerifyBtn');
     const videoLinkDisplay = document.getElementById('videoLinkDisplay');
 
-    // NEW REFERRAL ELEMENTS
-    const referralControlSection = document.getElementById('referralControlSection');
-    const requiredReferralCountDisplay = document.getElementById('requiredReferralCount');
-    const currentReferralCountDisplay = document.getElementById('currentReferralCount');
-    const referralCheckBtn = document.getElementById('referralCheckBtn');
-
-    const accessCodeForm = document.getElementById('accessCodeForm');
-    const accessCodeInput = document.getElementById('accessCodeInput');
-    const mainClaimBtn = document.getElementById('mainClaimBtn');
-    const claimLog = document.getElementById('claimLog');
-    const logoutBtn = document.getElementById('logoutBtn');
 
     // Keys and Storage
     const LIFAFA_STORAGE_KEY = 'nextEarnXLifafas';
@@ -207,27 +196,14 @@ document.addEventListener('DOMContentLoaded', () => {
             claimChecksPassed.telegram = true;
         }
     }
-
-    function checkReferral() {
-        const requiredRef = lifafaData.requirements?.referrals;
-
-        if (requiredRef) {
-            // MOCK: Assume user has met requirement
-            updateReqStatus(reqStatusReferral, true, `Referrals: ${requiredRef} required (MOCK: Passed)`);
-            claimChecksPassed.referral = true;
-        } else {
-            updateReqStatus(reqStatusReferral, true, "Referrals: Not Required.");
-            claimChecksPassed.referral = true;
-        }
-    }
+ 
 
     function checkAllRequirements() {
         if (!checkClaimedStatus()) return;
         if (!checkBanStatus()) return;
 
         checkAccessCode();
-        checkTelegram();
-        checkReferral();
+        checkTelegram(); 
 
         // If code is NOT required, or if all other checks pass, enable button
         const allSimpleChecksPass = claimChecksPassed.ban && claimChecksPassed.telegram && claimChecksPassed.referral;
@@ -236,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mainClaimBtn.disabled = false;
         }
     }
+    checkReferral
 
     // --- EVENT HANDLERS ---
 
@@ -285,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
             date: Date.now(),
             amount: claimAmount
         });
-
+checkReferral
         // Save the updated Lifafa List
         const allLifafas = JSON.parse(localStorage.getItem(LIFAFA_STORAGE_KEY));
         const index = allLifafas.findIndex(l => l.id === lifafaId);
