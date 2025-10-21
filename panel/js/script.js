@@ -158,3 +158,20 @@ document.addEventListener("DOMContentLoaded", () => {
   */
   // --- END: REDUNDANT SIMPLE LOGIN BLOCK REMOVED/SKIPPED ---
 });
+
+const myToast = login({
+    message: "Login in...",
+    iconType: "loader",
+    showIcon: true,
+    theme: "materialDark",
+    duration: 0, // Keep it open
+});
+
+setTimeout(() => {
+    myToast.update({
+        message: "Logged in successfully!",
+        iconType: "success",
+        theme: "sonoma", // Theme can be changed!
+        duration: 3000, // Now it will auto-close
+    });
+}, 2000);

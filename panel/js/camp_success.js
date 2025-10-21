@@ -55,10 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Mock Base URL - Note: {refer_id} is often used in Camp Links, and {campaign_id} for Self Refer
-    const baseUrl = `${window.location.origin}/camp/${shortName}`; 
-    const campLink = `${baseUrl}?ref={refer_id}`; // Example Camp Link
-    const referEarnLink = `${baseUrl}/refer.php?camp-${shortName}`; // Example Refer Link
-    const selfReferLink = `${baseUrl}/create.php?camp-${shortName}`; // Example Self Refer Link
+    const mockDomain = 'https://elfcampaign.rf.gd'; // Using the domain from the image for mock links
+    const campLink = `${mockDomain}/camp?camp-${shortName}`; 
+    const referEarnLink = `${mockDomain}/camp/refer.php?camp-${shortName}`; 
+    const selfReferLink = `${mockDomain}/camp/create.php?camp-${shortName}`; 
 
     // Render the three blocks
     createLinkBlock("Camp Link", campLink);

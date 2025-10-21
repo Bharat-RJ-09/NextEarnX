@@ -29,15 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
     createCampForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        const senderUsername = getCurrentUser();
-        if (!senderUsername) {
+        if (!getCurrentUser()) {
             alert("Error: User not logged in. Please log in again.");
             window.location.href = 'login.html';
             return;
         }
-        else {
-            console.log("Campaign created by user:", senderUsername);
-        }
+ 
+        const senderUsername = getCurrentUser();
+        
 
         // Gather all form data
         const formData = {
@@ -47,12 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
             amountPerUser: parseFloat(document.getElementById('amountPerUser').value) || 0,
             amountPerRefer: parseFloat(document.getElementById('amountPerRefer').value) || 0,
             steps: [
-                "Step 1: Enter Your Number (Fixed)",
+                "Step 1: Enter Your NEX Number ",
                 document.getElementById('step2').value.trim(),
                 document.getElementById('step3').value.trim(),
                 document.getElementById('step4').value.trim(),
                 document.getElementById('step5').value.trim()
-            ].filter(step => step && step !== 'Step 1: Enter Your Number (Fixed)'), // Filter out empty steps
+            ].filter(step => step && step !== 'Step 1: Enter Your NEX Number '), // Filter out empty steps
 
             creator: senderUsername,
             createdAt: Date.now()
@@ -70,19 +69,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Mock Campaign Link Generation
-        const mockLink = `${window.location.origin}/camp/${formData.campaignShortName}?ref={refer_id}`;
+        const shortName = formData.campaignShortName;
 
         if (confirm(`Confirm Creation of Campaign: ${formData.campaignName} (Cost: ₹${formData.amountPerUser.toFixed(2)} per user)?`)) {
             
             // --- MOCK SAVING LOGIC ---
-            // In a real app, this would deduct wallet balance and save to server/localStorage.
+            // Yahan par actual saving/deduction logic aayega.
             
-            alert(`✅ Campaign created successfully!\nLink: ${mockLink}\nTotal Steps: ${formData.steps.length}`);
-            
-            console.log("New Campaign Data:", formData);
-
-            // Optional: Redirect to a Camp List page or clear form
-            createCampForm.reset();
+            // Redirect to the success page with necessary parameters
+            const successUrl = `camp_success.html?shortName=${encodeURIComponent(shortName)}`;
+            window.location.href = successUrl;
         }
     });
 });
