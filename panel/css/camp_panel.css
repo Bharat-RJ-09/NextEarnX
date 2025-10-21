@@ -141,10 +141,10 @@ body {
 .admin-header {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #ff0077; /* Neon Pink/Red */
+    color: #00fff2; /* Neon Pink/Red */
     margin: 0 auto 25px auto;
     padding-bottom: 5px;
-    border-bottom: 2px solid #ff0077;
+    border-bottom: 2px solid #00ffea;
     width: 70%; /* Increase width for longer title */
     text-align: center;
 }
@@ -220,4 +220,86 @@ body {
 }
 .submit-btn.get-link-btn:hover {
     transform: translateY(-1px);
+}
+
+
+/* panel/css/camp_panel.css: APPEND Campaign Success Styles */
+
+.camp-result-card {
+    /* Result card ko center karne ke liye top margin de sakte hain */
+    margin-top: 30px;
+    padding: 30px 20px;
+}
+
+.success-header {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #4169E1; /* Blue for 'CREATED SUCCESSFULLY' */
+    margin-bottom: 30px;
+    padding: 5px 10px;
+    border: 2px solid #4169E1;
+    border-radius: 5px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* --- Link Result Blocks --- */
+.link-block {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px dotted rgba(255,255,255,0.1);
+}
+
+.link-block-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ff0077; /* Neon Pink/Red */
+    margin-bottom: 10px;
+    position: relative;
+    width: fit-content;
+    margin: 0 auto 15px auto;
+}
+/* Red line effect above header */
+.link-block-header::before,
+.link-block-header::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 25px; 
+    height: 1px;
+    background: #ff0077;
+}
+.link-block-header::before { left: -30px; }
+.link-block-header::after { right: -30px; }
+
+
+.link-input-display {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 2px solid #4169E1; /* Blue border */
+    background: rgba(0, 224, 255, 0.1); /* Light blue background */
+    color: #fff;
+    font-size: 0.95rem;
+    text-align: center;
+    overflow-x: auto; /* Agar link bahut bada ho to scroll ho jaye */
+    white-space: nowrap;
+    margin-bottom: 15px;
+}
+
+.copy-btn {
+    width: 100%;
+    padding: 12px;
+    background: #ff0077; /* Pink copy button */
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 4px 10px rgba(255,0,119,0.4);
+}
+.copy-btn:hover {
+    background: #c800ff; /* Violet on hover */
 }

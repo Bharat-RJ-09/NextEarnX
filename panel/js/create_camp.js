@@ -31,8 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const senderUsername = getCurrentUser();
         if (!senderUsername) {
-            alert("Error: User session lost. Please log in again.");
+            alert("Error: User not logged in. Please log in again.");
+            window.location.href = 'login.html';
             return;
+        }
+        else {
+            console.log("Campaign created by user:", senderUsername);
         }
 
         // Gather all form data
