@@ -1,0 +1,118 @@
+/* panel/css/camp_panel.css - Camp Panel Styles */
+
+/* --- BASE STYLES (Neon Dark Theme Consistency) --- */
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: Inter, sans-serif;
+    /* Background properties will be inherited from theme_base.css */
+    min-height: 100vh;
+    padding-top: 75px; 
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* --- NAVBAR (Inherited from common theme, adjust top padding) --- */
+/* (Styles are typically in theme_base.css, adjusting top padding here) */
+
+/* --- MAIN CONTAINER & CARD --- */
+.camp-container {
+    padding: 20px;
+    max-width: 450px; /* Slimmer card for buttons */
+    margin: 50px auto; /* More space from the top */
+}
+
+/* Base Card Style (Frosted Glass - Inherited) */
+.camp-card {
+    padding: 30px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    backdrop-filter: blur(12px) saturate(1.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.admin-header {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ff0077; /* Neon Pink/Red */
+    margin-bottom: 30px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ff0077;
+    width: 60%;
+    margin: 0 auto 30px auto;
+}
+
+/* --- BUTTON GRID --- */
+.button-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.camp-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.camp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+}
+
+/* Specific Button Colors */
+.camp-btn i {
+    font-size: 1.2rem;
+    margin-right: 10px;
+}
+
+.create-btn {
+    background: linear-gradient(90deg, #4169E1, #00e0ff); /* Blue/Cyan */
+}
+.edit-btn {
+    background: linear-gradient(90deg, #ffcc00, #ffdb4d); /* Yellow/Gold */
+    color: #1a1a2a;
+}
+.delete-btn {
+    background: linear-gradient(90deg, #ff0077, #c800ff); /* Pink/Violet */
+}
+.restore-btn {
+    background: #444;
+    border: 1px solid #777;
+}
+
+/* --- LOGOUT LINK --- */
+.logout-link {
+    font-size: 1rem;
+    color: #00e0ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+.logout-link:hover {
+    text-decoration: underline;
+}
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 480px) {
+    .camp-container {
+        padding: 0 10px;
+        margin: 30px auto;
+    }
+    .admin-header {
+        width: 80%;
+        font-size: 1.2rem;
+    }
+}
