@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Campaign - NextEarnX</title>
+  <link rel="stylesheet" href="css/camp_panel.css"> 
+  <link rel="stylesheet" href="css/theme_base.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+</head>
+<body>
+    
+    <nav class="navbar">
+        <a href="camp_panel.html" class="menu-btn"><i class="ri-arrow-left-line"></i></a>
+        <h1 class="logo">NextEarn<span>X</span></h1>
+        <button id="logoutBtn">Logout</button>
+    </nav>
+
+    <main class="camp-container">
+        
+        <section class="camp-form-card card">
+            
+            <h2 class="admin-header">CAMPAIGN MAKER</h2>
+            
+            <form id="createCampForm">
+
+                <div class="form-group input-icon-group">
+                    <i class="ri-bar-chart-box-line"></i>
+                    <input type="url" id="trackingLink" placeholder="Tracking Link (Required for analytics)" required>
+                </div>
+
+                <div class="form-group input-icon-group">
+                    <i class="ri-pencil-line"></i>
+                    <input type="text" id="campaignName" placeholder="Campaign Name" required>
+                </div>
+
+                <div class="form-group input-icon-group">
+                    <i class="ri-link"></i>
+                    <input type="text" id="campaignShortName" placeholder="Campaign Short Name (e.g., offer_jan25)" required>
+                </div>
+                
+                <div class="form-group input-icon-group">
+                    <i class="ri-money-rupee-circle-line"></i>
+                    <input type="number" id="amountPerUser" min="1" step="0.01" placeholder="Amount per user (₹)" required>
+                </div>
+
+                <div class="form-group input-icon-group">
+                    <i class="ri-share-forward-line"></i>
+                    <input type="number" id="amountPerRefer" min="0" step="0.01" placeholder="Amount per refer (₹) - Optional">
+                </div>
+
+                <h3 class="steps-header">USER ACTION STEPS</h3>
+                
+                <div class="form-group input-icon-group fixed-step">
+                    <i class="ri-list-ordered"></i>
+                    <input type="text" value="Step 1: Enter Your Number (Fixed)" readonly>
+                </div>
+                
+                <div class="form-group input-icon-group">
+                    <i class="ri-list-ordered-2"></i>
+                    <input type="text" id="step2" placeholder="Step 2: Enter description or link for action">
+                </div>
+                <div class="form-group input-icon-group">
+                    <i class="ri-list-ordered-3"></i>
+                    <input type="text" id="step3" placeholder="Step 3: Enter description or link for action">
+                </div>
+                <div class="form-group input-icon-group">
+                    <i class="ri-list-ordered-4"></i>
+                    <input type="text" id="step4" placeholder="Step 4: Enter description or link for action">
+                </div>
+                <div class="form-group input-icon-group">
+                    <i class="ri-list-ordered-5"></i>
+                    <input type="text" id="step5" placeholder="Step 5: Enter description or link for action">
+                </div>
+                
+                <button type="submit" class="submit-btn get-link-btn"><i class="ri-link"></i> Get Link</button>
+            </form>
+            
+        </section>
+
+    </main>
+
+    <script src="js/create_camp.js"></script>
+</body>
+</html>

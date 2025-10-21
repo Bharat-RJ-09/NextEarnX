@@ -30,7 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
             const action = e.currentTarget.id.replace('Btn', '');
-            alert(`Feature under construction: You clicked '${action}'.\n(Next Step: Implement actual functionality for ${action} page/modal)`);
+            if(action === 'createCamp') {
+                window.location.href = 'create_camp.html';
+            }
+            else if(action === 'viewStats') {
+                alert("View Stats feature coming soon!");
+            }
             // Yahan aap further logic ya naye pages par redirect kar sakte hain
         });
     });
