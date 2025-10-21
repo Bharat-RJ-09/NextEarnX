@@ -45,7 +45,10 @@ body::before {
     max-width: 600px;
     margin: 20px auto;
 }
-.header-section h2 { color: #00e0ff; margin: 0; }
+.header-section h2 { color: #00e0ff; margin: 0; 
+                     text-align: center;
+                     margin: 15px 0;
+                }
 
 /* Base Card Style */
 .card {

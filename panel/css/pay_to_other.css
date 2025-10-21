@@ -157,16 +157,21 @@
 
 /* Pay Button */
 .submit-btn.pay-btn { 
-    background: linear-gradient(90deg, #4169E1, #5c85ff);
+    background-color: rgb(112, 0, 224);
     color: #fff;
+    width: 100%;
+    height: auto;
+    margin: auto;
+    border: 1px solid rgb(55, 0, 157);
     font-weight: 700;
-    box-shadow: 0 4px 15px rgba(65, 105, 225, 0.4);
+    box-shadow: 0 0 5px rgba(0, 89, 255, 0.363);
     margin-top: 5px;
-    padding: 5px 12px;
+    padding: 10px 12px;
     border-radius: 8px ;
 }
 .submit-btn.pay-btn:hover {
-    background: linear-gradient(90deg, #5c85ff, #4169E1);
+    background: linear-gradient(90deg, #8800ff);
+    transition: 1s ease-in-out;
 }
 
 

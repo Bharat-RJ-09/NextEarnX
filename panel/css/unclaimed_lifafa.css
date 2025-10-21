@@ -36,7 +36,9 @@ body::before {
 #logoutBtn { background: #ff0077; border: none; color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
 
 /* --- MAIN CONTAINER & CARDS --- */
+ 
 .unclaimed-container {
+    text-align: center;
     padding: 20px;
     max-width: 600px;
     margin: 20px auto;
@@ -84,6 +86,24 @@ body::before {
     margin-top: 10px;
 }
 .action-btn:hover { background: #33ffff; }
+
+
+.remove-single-lifafa-btn{
+    background-color: rgb(60, 0, 255);
+    margin: 0 15px;
+    color: white;
+    border: 1px solid gray;
+    padding: 5px 15px;
+    border-radius: 12px;
+    font-weight: 666;
+    cursor: pointer;
+}
+
+.remove-single-lifafa-btn:hover{
+    background-color: white;
+    transition: .15s ease-in;
+    color: black;
+}
 .refund-btn {
     background: #ff0077; /* Neon Pink */
     color: #fff;

@@ -164,7 +164,7 @@ a { text-decoration: none; color: inherit; }
     box-shadow: 0 0 20px rgba(0,224,255,0.3);
 }
 .balance-card-new .card-header h3 {
-    color: #ff0077;
+    color: #c800ff;
 }
 .balance-amount {
     font-size: 2.5rem;
@@ -191,13 +191,13 @@ a { text-decoration: none; color: inherit; }
     background: rgba(0, 224, 255, 0.1);
 }
 .primary-btn {
-    background: #ff0077;
-    border-color: #ff0077;
+    background: #c800ff;
+    border-color: #c800ff;
     color: #fff;
     box-shadow: 0 4px 10px rgba(255,0,119,0.3);
 }
 .primary-btn:hover {
-    background: #ff3399;
+    background: #9a01c4;
 }
 
 
