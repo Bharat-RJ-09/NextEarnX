@@ -3,9 +3,9 @@
 
 
 /* Navbar (Fixed and Glass effect) */
-body{
-    text-align: center;
-}
+ 
+
+
 .navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -31,20 +31,26 @@ body{
     cursor: pointer;
 }
 
+.purchace-cont {
+    max-width: 600px;
+    margin: 120px auto 40px; /* Adjusted for fixed navbar */
+    padding: 0 20px;
+}
+
 header {
     text-align: center;
     margin: 30px 0 20px;
 }
 
 header h1 {
-    font-size: 2rem;
+    font-size: 1.2rem;
     margin-top: 2em;
     color: #00e0ff; /* Neon Cyan */
     margin-bottom: 5px;
 }
 
 header p {
-    font-size: 1rem;
+    font-size: .8rem;
     color: #aaa; 
 }
 
@@ -60,13 +66,15 @@ header p {
 
 /* Base Card Style (Frosted Glass) */
 .card {
-    margin-bottom: 20px;
-    padding: 25px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    border: 1px solid rgba(0, 224, 255, 0.4); /* Neon Cyan Border */
+    backdrop-filter: blur(10px) saturate(1.2);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(0, 224, 255, 0.4); /* Neon Glow */
     border-radius: 18px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-    backdrop-filter: blur(12px) saturate(1.1);
-    border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    padding: 20px;
+    color: #fff;
+    text-align: center;
+    width: 100%;
 }
 
 /* QR Code Container Styling */
@@ -128,10 +136,10 @@ header p {
 }
 
 .note {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    margin-top: 20px;
     color: #777;
-    margin-bottom: 20px;
-    max-width: 400px; 
+    margin-top: 20px;
 }
 
 @media (max-width: 420px) {

@@ -29,20 +29,22 @@ body {
 
 /* --- MAIN CONTAINER & CARD --- */
 .camp-container {
-    padding: 20px;
-    max-width: 450px; /* Slimmer card for buttons */
-    margin: 50px auto; /* More space from the top */
+    max-width: 900px;
+    margin: 40px auto 60px; /* Adjusted for fixed navbar */
+    padding: 0 20px;
 }
 
+
 /* Base Card Style (Frosted Glass - Inherited) */
-.camp-card, .camp-form-card, .camp-result-card {
-    padding: 30px;
+.camp-card, .camp-form-card, .camp-result-card  {
+    background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
     border-radius: 18px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-    backdrop-filter: blur(12px) saturate(1.1);
-    border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    text-align: center;
+    padding: 30px 25px;
+    backdrop-filter: blur(10px) saturate(1.2);
+    border: 1px solid rgba(0, 224, 255, 0.4); /* Neon Cyan Border */
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(0, 224, 255, 0.4); /* Neon Glow */
+    color: #fff;
+    margin-bottom: 30px;
 }
 
 /* --- Common Header Styles (Used by both Panel and Maker) --- */
@@ -63,24 +65,26 @@ body {
 
 
 /* --- BUTTON GRID (Camp Panel Menu) --- */
-.button-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 30px;
+.button-grid  {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(auto, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+
 }
-.camp-btn {
+.camp-btn  {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 15px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    text-decoration: none;
+    background: linear-gradient(90deg, #ff0077, #c800ff); /* Pink/Violet Gradient */
     color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
     transition: transform 0.2s, box-shadow 0.2s;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }

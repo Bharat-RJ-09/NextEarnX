@@ -28,7 +28,7 @@
             <form id="depositForm">
                 <div class="form-group">
                     <label for="depositAmount">Amount (Min ₹60):</label> 
-                    <input type="number" id="depositAmount" min="60" placeholder="Enter amount" required>
+                    <input type="tel" id="depositAmount" min="60" maxlength="5" placeholder="Enter amount" required>
                 </div>
                 <button type="submit" class="submit-btn"><i class="ri-wallet-3-line"></i> Proceed to Pay</button>
             </form>
@@ -39,7 +39,7 @@
             <form id="withdrawalForm">
                 <div class="form-group">
                     <label for="withdrawAmount">Amount (Min ₹150):</label> 
-                    <input type="number" id="withdrawAmount" min="150" placeholder="Enter amount" required>
+                    <input type="tel" id="withdrawAmount" min="150" maxlength="3" placeholder="Enter amount" required>
                 </div>
                 <div class="form-group">
                     <label for="upiAddress">Your UPI Address:</label>

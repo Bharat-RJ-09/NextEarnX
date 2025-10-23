@@ -8,6 +8,10 @@ html {
     height: 100%; 
 }
 
+.bdfont{
+    font-family: "Alan Sans", sans-serif;
+}
+
 /* --- BASE BODY BACKGROUND --- */
 body {
     /* CRITICAL CHANGE: Deep Black Background */

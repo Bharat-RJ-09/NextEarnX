@@ -1,28 +1,7 @@
 /* panel/css/unclaimed_lifafa.css - Unclaimed Lifafas Management Styles */
 
 /* --- BASE STYLES (Neon Dark Theme Consistency) --- */
-* { box-sizing: border-box; }
-body {
-    margin: 0;
-    font-family: Inter, sans-serif;
-    background: linear-gradient(135deg, #0a0a1a, #1a0a2a);
-    color: #e6eef8;
-    min-height: 100vh;
-    padding-top: 75px; 
-    position: relative;
-    overflow-x: hidden;
-}
-
-/* --- Animated Background Layer --- */
-body::before {
-    content: '';
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;
-    background: radial-gradient(circle at 10% 20%, rgba(106,17,203,0.1), transparent 30%),
-                radial-gradient(circle at 90% 80%, rgba(37,117,252,0.1), transparent 30%);
-    mix-blend-mode: screen;
-    animation: slowPan 30s infinite alternate;
-}
-
+ 
 /* --- NAVBAR (Fixed and Glass effect) --- */
 .navbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 10;
@@ -37,11 +16,11 @@ body::before {
 
 /* --- MAIN CONTAINER & CARDS --- */
  
-.unclaimed-container {
-    text-align: center;
-    padding: 20px;
-    max-width: 600px;
-    margin: 20px auto;
+.unclaimed-container  {
+    max-width: 900px;
+    margin: 120px auto 40px; /* Adjusted for fixed navbar */
+    padding: 0 20px;
+    color: #e6eef8;
 }
 .header-section h2 { color: #00e0ff; margin: 0; }
 .welcome-msg { color: #aaa; margin-bottom: 20px; font-size: 0.95rem; }
@@ -158,18 +137,19 @@ body::before {
 .check-card .input-icon-group {
     display: flex;
     align-items: center;
-    position: relative;
-    border: 1px solid rgba(255,255,255,0.1);
+    gap: 10px;
+    background: rgba(8,12,25,0.6);
+    border: 1px solid #ff0077; /* Neon Pink Border */
     border-radius: 8px;
-    padding: 8px 12px;
-    background: rgba(0,0,0,0.3);
+    padding: 10px 15px;
     margin-bottom: 15px;
 }
+
 .check-card .input-icon-group i {
     font-size: 1.2rem;
     color: #00e0ff;
     flex-shrink: 0;
-}
+} 
 .check-card .input-icon-group input {
     width: 100%;
     border: none;
@@ -177,7 +157,9 @@ body::before {
     color: white;
     font-size: 1rem;
     padding: 0;
-    padding-left: 10px;
+}
+.check-card .input-icon-group input:focus {
+    outline: none;
 }
 
 /* Check Button */

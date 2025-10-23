@@ -36,13 +36,11 @@ document.addEventListener("DOMContentLoaded", () => {
     clearInterval(otpTimerInterval);
     otpExpires = Date.now() + 60 * 1000; // 60 seconds validity
     resendOtpBtn.disabled = true;
-    
     otpTimerInterval = setInterval(() => {
       const diff = Math.max(0, otpExpires - Date.now());
       const sec = Math.ceil(diff / 1000);
       const ss = String(sec % 60).padStart(2, "0");
       otpTimer.textContent = `00:${ss}`;
-      
       if (diff <= 0) {
         clearInterval(otpTimerInterval);
         otpStatusMessage.textContent = "OTP expired. Resend or try again.";
@@ -53,17 +51,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 500);
   }
 
+  // --- OTP GENERATION AND SENDING ---
+   
   function generateAndSendOtp() {
-    generatedOtp = Math.floor(100000 + Math.random() * 900000);
-    console.log("DEV SIGNUP OTP (for testing):", generatedOtp); // DEV-ONLY
-    
-    otpVerificationSection.style.display = 'block';
-    sendOtpBtn.style.display = 'none';
-    otpStatusMessage.textContent = `OTP sent to ${mobileInput.value} (Check console).`;
-    otpStatusMessage.style.color = "yellow";
-    
-    startOtpTimer();
+      generatedOtp = Math.floor(100000 + Math.random() * 900000);
+      alert(`Your OTP is: ${generatedOtp}`); // Simulate sending OTP
+      // console.log("Temp OTP:", generatedOtp); // DEV-ONLY
+      otpVerificationSection.style.display = 'block';
+      sendOtpBtn.style.display = 'none';
+      otpStatusMessage.textContent = `OTP sent to ${mobileInput.value}.`;
+      otpStatusMessage.style.color = "yellow";
+      startOtpTimer();
   }
+  
   
   sendOtpBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -157,6 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Please fill all fields!");
       return;
     }
+
+    
+
     // Final validations (check that mobile and username passed all previous checks)
     if (!usernameRegex.test(username)) { alert("Invalid username. Follow rules."); return; }
     if (!/^[^\s@]+@gmail\.com$/.test(email)) { alert("Please use a valid Gmail address."); return; }
@@ -174,4 +177,8 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("Account created successfully! Please login.");
     window.location.href = "login.html"; // go to login
   });
+
+
+
 });
+ 

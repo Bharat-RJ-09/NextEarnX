@@ -1,530 +1,308 @@
-/* panel/css/make_lifafa.css - Create Lifafa Dedicated Page Styles */
+/* panel/css/make_lifafa.css - Refined & fixed version (replace existing file) */
 
-/* --- BASE STYLES (Neon Dark Theme Consistency) --- */
-* { box-sizing: border-box; }
-body {
-    margin: 0;
-    font-family: Inter, sans-serif;
-    background: linear-gradient(135deg, #0a0a1a, #1a0a2a);
-    color: #e6eef8;
-    min-height: 100vh;
-    padding-top: 75px; 
-    position: relative;
-    overflow-x: hidden;
-}
-
-/* --- Animated Background Layer --- */
-body::before {
-    content: '';
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;
-    background: radial-gradient(circle at 10% 20%, rgba(106,17,203,0.1), transparent 30%),
-                radial-gradient(circle at 90% 80%, rgba(37,117,252,0.1), transparent 30%);
-    mix-blend-mode: screen;
-    animation: slowPan 30s infinite alternate;
-}
-@keyframes slowPan {
-    from { transform: translate(0, 0); }
-    to { transform: translate(-5%, 5%); }
+/* -------------------------
+    THEME VARIABLES
+    ------------------------- */
+:root{
+  --bg-1: #0a0a1a;
+  --bg-2: #1a0a2a;
+  --glass: rgba(255,255,255,0.06);
+  --glass-strong: rgba(255,255,255,0.12);
+  --muted: rgba(255,255,255,0.65);
+  --accent-cyan: #00e0ff;
+  --accent-blue: #4169E1;
+  --accent-pink: #FF0077;
+  --accent-yellow: #ffcc00;
+  --violet: rgba(132, 2, 238, 0.98);
+  --card-radius: 14px;
+  --transition: 240ms cubic-bezier(.2,.9,.2,1);
 }
 
-/* --- NAVBAR --- */
-.navbar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
-    background: rgba(15, 15, 30, 0.6); backdrop-filter: blur(15px) saturate(1.2);
-    display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-.menu-btn { color: #fff; font-size: 24px; text-decoration: none; }
-.logo { font-size: 24px; font-weight: 700; color: #fff; }
-.logo span { color: #00e0ff; }
-#logoutBtn { background: #ff0077; border: none; color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
-
-/* --- LIFAFA CONTAINER & HEADER --- */
-.lifafa-container {
-    padding: 20px;
-    max-width: 600px;
-    margin: 20px auto;
-}
-.header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-.lifafa-container h2 {
-    color: #00e0ff;
-    margin: 0;
-}
-.balance-status {
-    font-size: 1rem;
-    color: #aaa;
+/* -------------------------
+    BASE / LAYOUT
+    ------------------------- */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background:linear-gradient(135deg,var(--bg-1),var(--bg-2));
+  color:var(--muted);
+  min-height:100vh;
+  padding-top:75px;
+  position:relative;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
-/* --- BASE CARD STYLES --- */
-.card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-    border-radius: 18px;
-    padding: 25px;
-    backdrop-filter: blur(12px) saturate(1.1);
-    border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    margin-bottom: 30px;
+/* animated backdrop */
+body::before{
+  content:'';
+  position:fixed;inset:0;z-index:-1;
+  background:
+     radial-gradient(circle at 10% 20%, rgba(106,17,203,0.08), transparent 28%),
+     radial-gradient(circle at 90% 80%, rgba(37,117,252,0.08), transparent 28%);
+  mix-blend-mode:screen;
+  animation:slowPan 28s infinite alternate linear;
+}
+@keyframes slowPan{from{transform:translate(0,0)}to{transform:translate(-4%,4%)}}
+
+/* reduced motion preference */
+@media (prefers-reduced-motion: reduce){
+  body::before, .accordion-header:hover { animation: none; transform: none; transition: none; }
 }
 
-/* --- SECONDARY LIFAFA TABS --- */
-.lifafa-tabs-secondary {
-    display: flex;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 25px;
-    border: 1px solid rgba(255,255,255,0.1);
-    position: relative;
-    padding-right: 80px; /* Space for the Draft button */
+/* navbar */
+.navbar{
+  position:fixed;inset:0 0 auto 0;top:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;
+  background: rgba(10,10,25,0.6);
+  backdrop-filter: blur(12px) saturate(1.1);
+  border-bottom:1px solid rgba(255,255,255,0.04);
 }
+.menu-btn{color:#fff;font-size:24px;text-decoration:none}
+.logo{font-size:20px;font-weight:700;color:#fff}
+.logo span{color:var(--accent-cyan)}
+#logoutBtn{
+  background:var(--accent-pink);
+  border:none;color:#fff;padding:8px 14px;border-radius:10px;cursor:pointer;
+  box-shadow:0 6px 18px rgba(255,0,119,0.15);
+}
+
+/* container */
+.lifafa-container{
+  padding:22px;
+  max-width:760px;
+  margin:22px auto;
+  width:calc(100% - 32px);
+}
+
+/* header */
+.header-section{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.lifafa-container h2{color:var(--accent-cyan);margin:0;font-size:1.35rem}
+.balance-status{font-size:0.95rem;color:rgba(255,255,255,0.7)}
+
+/* card */
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border-radius:var(--card-radius);
+  padding:22px;
+  backdrop-filter: blur(10px) saturate(1.05);
+  border:1px solid rgba(255,255,255,0.06);
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+  margin-bottom:28px;
+}
+
+/* tabs */ 
+
+.lifafa-tabs-secondary{
+  display:flex;
+  justify-content:center;
+  align-self: center; 
+  background:rgba(0,0,0,0.2);
+  border:1px solid rgba(255,255,255,0.1); 
+  margin-bottom:20px;
+  margin-top:20px;
+  border-radius: 20px;
+  min-width: 100%;
+
+}
+
 .lifafa-tab-secondary {
-    flex-grow: 1;
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.8);
-    padding: 10px 5px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+  flex-grow:1;
+  background:none;
+  border:none;
+  color:rgba(255,255,255,0.7);
+  padding:12px 15px;
+  border-radius:20px;
+  cursor:pointer;
+  font-weight:600;
+  transition:background var(--transition), color var(--transition);
+
 }
-.lifafa-tab-secondary.active {
-    background: #4169E1; /* Primary Blue Active */
-    color: #fff;
-    font-weight: 600;
+  
+.lifafa-tab-secondary.active{
+  background: linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+  color:#fff; font-weight:700;
 }
-.draft-btn {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #444466; /* Dark background for Draft */
-    border: 1px solid #777;
-    color: #ffcc00;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-.draft-btn:hover {
-    background: #555577;
+.draft-btn{
+    position:absolute;top:2px;right:2px;
+    background:var(--accent-yellow);
+    color:#1a1a2a;
+    border:none;
+    padding:8px 14px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(255,204,0,0.15);
+    transition:background var(--transition), transform var(--transition);
 }
 
-
-/* --- FORM STYLES (MATCHING USER'S IMAGE) --- */
-.form-group input
-    { 
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-.lifafa-form-new .input-icon-group {
-    display: flex;
-    align-items: center;
-    position: relative;
-    padding: 15px;  
-    border: 1px solid rgba(132, 2, 238, 0.987);
-    border-radius: 10px;
-    margin-bottom: 12px;
-    background: rgba(0,0,0,0.2);
-}
-.lifafa-form-new .input-icon-group:focus-within { 
-    box-shadow: 0 0 5px rgba(0,224,255,0.5);
-}
-.lifafa-form-new .input-icon-group i {
-    position: absolute; 
-    left: 15px;
-    color: #00fff2; /* White icon */
-    font-size: 1.2rem;
-    z-index: 2;
-}
-.lifafa-form-new .input-icon-group input {
-    width: 100%;
-    padding: 0;
-    border: none;
-    background: transparent;
-    color: white;  
-    font-size: 1rem;
-    padding-left: 35px; /* Adjust input padding for icon */
+.draft-btn:hover{
+  background:#ffdd33;transform:translateY(-2px);
 }
 
-/* Submit Button */
-.submit-btn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: background 0.2s;
+/* form base */
+.lifafa-form-new .input-icon-group{
+  display:flex;align-items:center;position:relative;padding:12px 14px;border-radius:10px;
+  background:rgba(0,0,0,0.18);
+  border:1px solid var(--violet);
+  margin-bottom:14px;
+  transition:box-shadow var(--transition), border-color var(--transition), transform var(--transition);
 }
-.submit-btn.create-btn {
-    background: linear-gradient(90deg, #4169E1, #00e0ff);
-    color: #fff;
-    font-weight: 700;
-    box-shadow: 0 4px 15px rgba(65, 105, 225, 0.4);
+.lifafa-form-new .input-icon-group:focus-within{
+  box-shadow:0 6px 20px rgba(0,224,255,0.10);
+  border-color:var(--accent-cyan);
+  transform:translateY(-1px);
 }
-.submit-btn.create-btn:hover {
-    background: linear-gradient(90deg, #5c85ff, #33ffff);
+.lifafa-form-new .input-icon-group i{
+  position:absolute;left:12px;color:#00fff2;font-size:1.05rem;z-index:2;
 }
-
-/* Lifafa Log Area */
-.lifafa-log-area {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.1);
-}
-.lifafa-log-area h4 {
-    color: #00e0ff;
-    margin-bottom: 10px;
-}
-#activeLifafasList {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 10px;
-    border-radius: 8px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-.lifafa-item {
-    padding: 8px 0;
-    border-bottom: 1px dotted rgba(255, 255, 255, 0.1);
-    font-size: 0.9rem;
-    word-break: break-all;
-}
-.lifafa-item span.link {
-    color: #ffcc00;
-    font-weight: 500;
-    cursor: pointer;
+.lifafa-form-new .input-icon-group input,
+.lifafa-form-new .input-icon-group textarea{
+  width:100%;padding:10px 14px 10px 40px;border:0;background:transparent;color:#fff;font-size:1rem;
+  outline:none;
 }
 
-/* Activity Log */
-.result-display h3 {
-    margin-bottom: 10px;
-    color: #ff0077;
+/* submit button */
+.submit-btn{width:100%;padding:12px;border:0;border-radius:10px;cursor:pointer;font-size:1rem;font-weight:700;transition:all var(--transition)}
+.submit-btn.create-btn{
+  background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));color:#fff;
+  box-shadow:0 8px 22px rgba(65,105,225,0.28);
 }
-#logArea {
-    background: rgba(0,0,0,0.5);
-    border-radius: 8px;
-    padding: 15px;
-    max-height: 200px;
-    overflow-y: auto;
-    font-size: 14px;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-#logArea p {
-    margin: 5px 0;
-    line-height: 1.5;
-    border-bottom: 1px dotted rgba(255,255,255,0.1);
+.submit-btn.create-btn:hover{
+  background:linear-gradient(90deg,#5c85ff,#33ffff);transform:translateY(-2px);
 }
 
-/* --- MOBILE RESPONSIVENESS --- */
-@media (max-width: 600px) {
-    .lifafa-container {
-        padding: 0 10px;
-    }
+/* lifafa log area */
+.lifafa-log-area{margin-top:20px;padding-top:14px;border-top:1px dashed rgba(255,255,255,0.06)}
+.lifafa-log-area h4{color:var(--accent-cyan);margin-bottom:10px}
+#activeLifafasList{
+  background:rgba(0,0,0,0.18);padding:10px;border-radius:10px;max-height:220px;overflow:auto;border:1px solid rgba(255,255,255,0.04)
+}
+.lifafa-item{padding:8px 0;border-bottom:1px dotted rgba(255,255,255,0.04);font-size:0.95rem;word-break:break-word}
+.lifafa-item span.link{color:var(--accent-yellow);font-weight:600;cursor:pointer}
+
+/* activity log */
+.result-display h3{margin-bottom:10px;color:var(--accent-pink)}
+#logArea{background:rgba(0,0,0,0.45);border-radius:10px;padding:14px;max-height:220px;overflow:auto;font-size:0.95rem;border:1px solid rgba(255,255,255,0.05)}
+#logArea p{margin:6px 0;line-height:1.5;border-bottom:1px dotted rgba(255,255,255,0.04);padding-bottom:6px}
+
+/* responsive */
+@media (max-width:600px){
+  .lifafa-container{padding:12px} 
+  .navbar{padding:10px 12px}
 }
 
-
-/* --- ADD THIS CODE AT THE END OF panel/css/make_lifafa.css --- */
-/* --- ACCORDION (ADVANCED OPTIONS) STYLES --- */
-.accordion-header {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    margin-bottom: 5px;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    user-select: none;
-    color: #fff;
-    background: rgba(255,255,255,0.05); /* Default Card look */
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: all 0.3s ease-in-out; /* Add transition for color/shadow */
-    position: relative; 
-    z-index: 2;
+/* -------------------------
+    ACCORDION (Advanced Options)
+    ------------------------- */
+.accordion-header{
+  display:flex;align-items:center;padding:14px;margin-bottom:6px;border-radius:10px;font-weight:700;cursor:pointer;
+  user-select:none;color:#fff;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
+  transition:box-shadow var(--transition), transform var(--transition), background var(--transition);
+  position:relative;z-index:2;
 }
+.accordion-header:hover{box-shadow:0 8px 26px rgba(0,224,255,0.06);transform:translateY(-3px)}
+.accordion-header i:first-child{margin-right:10px;font-size:1.12rem}
+.accordion-header .arrow-icon{margin-left:auto;transition:transform 320ms ease;transform-origin:center}
 
-/* Red Accent/Feature Header Styling (Updated look) */
-.accordion-header.red-header {
-    /* New background gradient for a distinct look */
-    background: linear-gradient(90deg, #FF0077, #E040FB); 
-    color: #fff;
-    border: 1px solid #FF0077;
-    box-shadow: 0 4px 10px rgba(255,0,119,0.2);
+/* red accent header */
+.accordion-header.red-header{
+  background:linear-gradient(90deg,var(--accent-pink),#E040FB);border:1px solid var(--accent-pink);
+  box-shadow:0 8px 22px rgba(255,0,119,0.12)
 }
-
-.accordion-header:hover {
-    box-shadow: 0 0 15px rgba(0, 224, 255, 0.4); /* Neon Cyan Hover Glow */
-    transform: translateY(-2px);
+.accordion-header.active{
+  border-radius:10px 10px 0 0;
+  box-shadow:0 14px 36px rgba(255,0,119,0.14);
+  background:linear-gradient(90deg,#E040FB,var(--accent-pink));
 }
+.accordion-header.active .arrow-icon{transform:rotate(180deg)}
 
-.accordion-header i:first-child {
-    margin-right: 10px;
-    font-size: 1.2rem;
+/* content */
+.accordion-content{
+  background:rgba(0,0,0,0.18);padding:0 14px;border:1px solid rgba(255,255,255,0.04);border-top:none;
+  border-radius:0 0 10px 10px;overflow:hidden;max-height:0;opacity:0;transition:max-height 420ms cubic-bezier(.2,.9,.2,1),padding 300ms,opacity 300ms;
+  z-index:1;will-change:max-height,opacity;
 }
+.accordion-content.active{max-height:520px;padding:14px;opacity:1;margin-bottom:16px}
 
-.accordion-header .arrow-icon {
-    margin-left: auto;
-    transition: transform 0.3s ease;
+/* feature headers */
+.accordion-header.feature-header{
+  background:linear-gradient(90deg, rgba(50,220,214,0.9), rgba(50,70,220,0.75));
+  margin-bottom:1px;border-radius:0;border:1px solid rgba(255,255,255,0.04)
 }
+/* ensure first feature block gets top corners when needed */
+.lifafa-form-new .accordion-header:nth-of-type(3){border-radius:10px 10px 0 0}
 
-/* Accordion Content (Smooth Collapse using max-height) */
-.accordion-content {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 0 15px; 
-    border-radius: 0 0 10px 10px;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-top: none;
-    max-height: 0; /* Initial state: collapsed */
-    opacity: 0; /* Initial state: hidden */
-    transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out, opacity 0.3s ease;
-    z-index: 1;
-    will-change: max-height, opacity; /* Performance optimization */
+/* referEarn final content */
+#referEarnContent{border-radius:0 0 10px 10px;margin-bottom:24px}
+
+/* Input overrides inside accordion content */
+.accordion-content .input-icon-group{
+  padding:12px;border-radius:10px;margin-bottom:12px;background:rgba(8,12,25,0.55);
+  border:1px solid rgba(255,255,255,0.06);
+}
+.accordion-content .input-icon-group:focus-within{border-color:var(--accent-yellow);box-shadow:0 6px 18px rgba(255,204,0,0.08)}
+.accordion-content textarea{
+  width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.3);color:#fff;font-size:1rem;resize:vertical;min-height:80px;margin-bottom:6px
+}
+.accordion-content .input-icon-group input{
+  width:100%;padding:8px 10px;font-size:1rem;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.04);border-radius:10px;
 }
 
-/* Active State for Accordion Header (When open) */
-.accordion-header.active {
-    border-radius: 10px 10px 0 0;
-    box-shadow: 0 0 15px rgba(255,0,119,0.5);
-    background: linear-gradient(90deg, #E040FB, #FF0077);
-}
+/* remove use of !important; prefer specificity instead */
+#telegramChannelContent .input-icon-group{display:none}
 
-.accordion-header.active .arrow-icon {
-    transform: rotate(180deg);
+/* -------------------------
+    TELEGRAM / ACTIONS
+    ------------------------- */
+.telegram-settings-link-container{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,0,0,0.28);border-radius:10px;border:1px solid rgba(0,224,255,0.14);margin-top:6px;flex-wrap:wrap
 }
+.telegram-settings-link-container i.ri-telegram-fill{font-size:1.4rem}
+.telegram-settings-link-container .setting-title{font-weight:800;color:#fff;flex-grow:1}
+.manage-channels-link{color:#aaffaa;text-decoration:none;font-weight:700;display:flex;align-items:center;gap:6px;transition:color var(--transition)}
+.manage-channels-link:hover{color:#ccffcc;text-decoration:underline}
+.channels-status-note{width:100%;font-size:0.82rem;color:var(--accent-yellow);margin:6px 0 0 0}
 
-/* Active State for Accordion Content (Expanded) */
-.accordion-content.active {
-    max-height: 500px; /* A large enough value for smooth slide down */
-    padding: 15px; 
-    opacity: 1;
-    margin-bottom: 15px; /* Add margin to content, not header */
-}
+.action-btn{background:none;border:1px solid var(--accent-cyan);color:var(--accent-cyan);padding:8px 14px;border-radius:10px;cursor:pointer;transition:background var(--transition)}
+.action-btn:hover{background:rgba(0,224,255,0.06)}
 
-/* --- ADD THIS CODE AT THE END OF panel/css/make_lifafa.css --- */
+/* -------------------------
+    YOUTUBE SLIDER
+    ------------------------- */
+#watchDurationSlider{appearance:none;height:8px;background:rgba(255,255,255,0.08);border-radius:999px;outline:none;transition:opacity .2s}
+#watchDurationSlider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:var(--accent-pink);border-radius:50%;cursor:pointer;box-shadow:0 4px 14px rgba(255,0,119,0.85);border:2px solid #111}
+#watchDurationSlider::-moz-range-thumb{width:20px;height:20px;background:var(--accent-pink);border-radius:50%;cursor:pointer;box-shadow:0 4px 14px rgba(255,0,119,0.85);border:2px solid #111}
 
-/* --- FEATURE ACCORDION SPECIFIC STYLES --- */
+/* -------------------------
+    DRAFT MODAL
+    ------------------------- */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(5px);z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px
+}
+.modal-content{
+  background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  border:1px solid rgba(255,204,0,0.18);backdrop-filter:blur(8px) saturate(1.05);box-shadow:0 20px 48px rgba(0,0,0,0.6);
+  width:100%;max-width:460px;padding:22px;border-radius:16px;position:relative;color:#fff
+}
+.close-modal-btn{position:absolute;top:12px;right:16px;background:none;border:0;color:#fff;font-size:1.25rem;cursor:pointer}
 
-/* Feature headers use a slightly different color and style (based on image) */
-.accordion-header.feature-header {
-    background: linear-gradient(90deg, rgba(50, 220, 214, 0.9), rgba(50, 70, 220, 0.7));
-    margin-bottom: 1px; /* To make them look grouped */
-    border-radius: 0;
-}
-/* First feature header needs top border-radius */
-.lifafa-form-new .accordion-header:nth-of-type(3) { /* Targeting Telegram Channel which is the 3rd accordion (1st feature block) */
-    border-radius: 10px 10px 0 0;
-}
+/* draft list items */
+.draft-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dotted rgba(255,255,255,0.04)}
+.draft-item-info{color:#fff;font-size:0.95rem;cursor:pointer;transition:color var(--transition)}
+.draft-item-info:hover{color:var(--accent-cyan);text-decoration:underline}
+.draft-item-delete{background:var(--accent-pink);color:#fff;border:0;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:0.85rem}
 
-/* Last accordion content needs bottom border-radius */
-#referEarnContent {
-    border-radius: 0 0 10px 10px;
-    margin-bottom: 25px; /* Add space below the final group */
-}
+/* scrollbar styling for lists */
+#activeLifafasList::-webkit-scrollbar,#logArea::-webkit-scrollbar{height:8px;width:8px}
+#activeLifafasList::-webkit-scrollbar-thumb,#logArea::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:8px}
+#activeLifafasList::-webkit-scrollbar-track,#logArea::-webkit-scrollbar-track{background:transparent}
 
-/* 2. Input-Icon-Group Reset/Override (For Access Code/Links) */
-.accordion-content .input-icon-group {
-    /* Overrides the conflicting styles for a neat look */
-    padding: 12px 15px; 
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    margin-bottom: 15px; /* Added spacing */
-    background: rgba(8,12,25,0.5); 
-}
-
-.accordion-content .input-icon-group:focus-within {
-    border-color: #ffcc00;
-    box-shadow: 0 0 5px rgba(255, 204, 0, 0.5); 
-}
-
-.accordion-content textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.2);
-    margin-bottom: 3px;
-    background: rgba(0,0,0,0.3);
-    color: white;
-    font-size: 1rem;
-    resize: vertical;
-    min-height: 80px;
-}
-
-.accordion-content .input-icon-group input  {
-    /* Ensures input inside icon group is styled correctly */
-    padding-left: 10px; 
-    font-size: 1rem;
-    background: transparent; 
-    color: white; 
-    border: 1 px solid rgb(252, 0, 215);   
-    border-radius: 15px;
-    padding: 4px 7px;
-    min-width: 100%;
-}
-/* Re-added fix to eliminate the leftover 'important' margin issue */
-.accordion-content #accessCodeContent .input-icon-group {
-    margin-bottom: 0 !important;
-}
-
-/* --- ADD THESE STYLES TO panel/css/make_lifafa.css --- */
-
-/* --- TELEGRAM LINK CONTAINER STYLES --- */
-.telegram-settings-link-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 15px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    border: 1px solid rgba(0, 224, 255, 0.2);
-    margin-top: 5px;
-    flex-wrap: wrap; 
-}
-
-.telegram-settings-link-container i.ri-telegram-fill {
-    font-size: 1.5rem;
-}
-
-.telegram-settings-link-container .setting-title {
-    font-weight: 700;
-    color: #fff;
-    flex-grow: 1; 
-}
-
-.manage-channels-link {
-    color: #aaffaa; 
-    text-decoration: none;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: color 0.2s;
-}
-
-.manage-channels-link:hover {
-    color: #ccffcc;
-    text-decoration: underline;
-}
-
-.channels-status-note {
-    width: 100%; 
-    font-size: 0.8rem;
-    color: #ffcc00; /* Yellow status note */
-    margin: 5px 0 0 0;
-}
-
-/* Hide the old input group that was here */
-#telegramChannelContent .input-icon-group {
-    display: none !important;
-}
-
-.action-btn {
-    background: none;
-    border: 1px solid #00e0ff;
-    color: #00e0ff;
-    padding: 8px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-/* panel/css/make_lifafa.css: NEW BLOCK (Add this at the very end of the file) */
-
-/* --- YOUTUBE SLIDER STYLES (Theme-appropriate design) --- */
-
-#watchDurationSlider {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 8px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 4px;
-    outline: none;
-    transition: opacity .2s;
-}
-
-#watchDurationSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #FF0077; /* Neon Pink Thumb */
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 0 5px rgba(255,0,119,0.8);
-    border: 2px solid #1a1a2a;
-}
-
-#watchDurationSlider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: #FF0077;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 0 5px rgba(255,0,119,0.8);
-    border: 2px solid #1a1a2a;
-}
-
-/* panel/css/make_lifafa.css: NEW BLOCK (Add this at the very end of the file) */
-
-/* --- DRAFT MODAL STYLES --- */
-.modal-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(5px);
-    z-index: 5000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.modal-content {
-    background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-    border: 1px solid rgba(255, 204, 0, 0.4); 
-    backdrop-filter: blur(10px) saturate(1.2);
-    box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
-    width: 90%;
-    max-width: 400px;
-    padding: 25px;
-    border-radius: 18px;
-    position: relative;
-    color: #fff;
-}
-.close-modal-btn {
-    position: absolute; top: 10px; right: 15px; background: none; border: none; 
-    color: #fff; font-size: 1.5rem; cursor: pointer;
-}
-
-/* Draft List Items */
-.draft-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px dotted rgba(255,255,255,0.1);
-}
-.draft-item-info {
-    color: #fff;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-.draft-item-info:hover {
-    color: #00e0ff;
-    text-decoration: underline;
-}
-.draft-item-delete {
-    background: #ff0077;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.8rem;
-}
+/* small helpers */
+.hidden{display:none !important}
+.text-muted{color:rgba(255,255,255,0.55);font-size:0.9rem}
+.center{display:flex;align-items:center;justify-content:center}

@@ -1,69 +1,37 @@
- 
-body {
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* CRITICAL CHANGE: Deep Black Background */
-  background: #00000a;
-  display: flex;
-  align-items: center; 
-  justify-content: center; 
-  padding: 50px 0;
+
+html,body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;  
+}
+
+.form-container {
+    /* REMOVED fixed positioning and margin */
+    position: relative;
+    z-index: 2;    
+    border-radius: 18px;
+    box-shadow: 0 10px 40px rgba(2,6,23,0.6);
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255, 255, 255, 0.269);
+    backdrop-filter: blur(8px) saturate(1.05);
+    -webkit-backdrop-filter: blur(8px) saturate(1.05);
+    color: #e6eef8;
+    text-align: center;
+    width: 400px;
+    margin: auto;
+    margin-top: 12%;
+    padding: 32px;
 }
 
 /* --- Animated Background Layer (Aqua Blur Balls) - Replacing complex old styles --- */
-.background {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-  /* This element now acts as the pseudo-element container */
-  /* Remove old ::before, ::after, .bg-blur */
-}
-
-.background::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    z-index: 0;
-    /* Aqua/Cyan Radial Gradients (Blur Balls) */
-    background: 
-        /* Large Aqua Ball (Top Left) */
-        radial-gradient(circle at 20% 15%, rgba(0, 255, 255, 0.25), transparent 45%),
-        /* Smaller Cyan Ball (Bottom Right) */
-        radial-gradient(circle at 85% 75%, rgba(0, 224, 255, 0.30), transparent 40%),
-        /* Medium Aqua Glow (Center) */
-        radial-gradient(circle at 50% 50%, rgba(0, 160, 255, 0.15), transparent 60%);
-    
-    mix-blend-mode: screen;
-    filter: blur(50px);
-    animation: aquaFloat 25s infinite ease-in-out alternate;
-    opacity: 1; /* Ensure full opacity */
-}
-/* Keyframes for Floating Blur - REPLACING old animation blocks */
- 
-/* -------------------------------------- */
+  
 
 /* ---------- Glass Card (Signup) ---------- */
-.form-container, .login-container {
-  position: relative;
-  z-index: 2;
-  width: 360px;
-  /* CRITICAL FIX: Remove centering properties here, let body flexbox handle it */
-  /* REMOVED: margin: auto; margin-top: 20%; transform: translateY(-50%); */
-  
-  padding: 32px;
-  border-radius: 18px;
-  box-shadow: 0 10px 40px rgba(2,6,23,0.6);
-  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.06);
-  backdrop-filter: blur(8px) saturate(1.05);
-  -webkit-backdrop-filter: blur(8px) saturate(1.05);
-  color: #e6eef8;
-  text-align: center;
-}
-
+ 
 /* Header */
 .form-container h2, .login-container h1 {
   margin-bottom: 18px;

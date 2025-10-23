@@ -1,23 +1,34 @@
  
 
 /* ---------- Login container (frosted card) ---------- */
-.login-container {
-    /* REMOVED fixed positioning and margin */
-    position: relative;
-    z-index: 2;  
-    width: 400px;
-    margin: auto;
-    margin-top: 12%;
-    padding: 32px;
-    border-radius: 18px;
-    box-shadow: 0 10px 40px rgba(2,6,23,0.6);
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-    border: 1px solid rgba(255,255,255,0.06);
-    backdrop-filter: blur(8px) saturate(1.05);
-    -webkit-backdrop-filter: blur(8px) saturate(1.05);
-    color: #e6eef8;
-    text-align: center;
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #01010a; /* Deep Black Background */
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+.login-container {
+  width: 360px;
+  max-width: calc(100% - 40px);
+  padding: 30px 25px;
+  border-radius: 18px;
+  /* Frosted Glass Look */
+  background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  border: 1px solid rgba(0, 224, 255, 0.4); /* Neon Cyan Border */
+  backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(0, 224, 255, 0.4); /* Neon Glow */
+  color: #fff;
+  text-align: center;
+  position: relative;
+}
+
 .login-container h1 {
   margin-bottom: 18px;
   font-size: 20px;

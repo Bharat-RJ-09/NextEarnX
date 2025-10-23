@@ -18,13 +18,16 @@
 
 /* --- TRANSFER LAYOUT --- */
 .transfer-container {
-    padding: 20px;
     max-width: 600px;
-    margin: 20px auto;
+    margin: 120px auto 40px; /* Adjusted for fixed navbar */
+    padding: 0 20px;
+    color: #e6eef8;
 }
+
 .header-section {
     display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
 }
+
 .transfer-container h2 { color: #00e0ff; margin: 0; }
 .balance-status { font-size: 1rem; color: #aaa; }
 
@@ -33,17 +36,16 @@
     background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
     border-radius: 18px;
     padding: 10px; /* Reduced internal padding for cleaner look */
-    backdrop-filter: blur(12px) saturate(1.1);
+    backdrop-filter: blur(20px) saturate(1.1);
     border: 1px solid rgba(255,255,255,0.15);
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     margin-bottom: 30px;
 }
+
 .status-msg {
-    margin-top: 15px;
     margin-bottom: 15px;
-    color: #ff0077; 
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 1rem;
+    color: #00f7ff;
 }
 
 
@@ -162,7 +164,7 @@
     width: 100%;
     height: auto;
     margin: auto;
-    border: 1px solid rgb(55, 0, 157);
+    border: 1px solid rgb(255, 255, 255);
     font-weight: 700;
     box-shadow: 0 0 5px rgba(0, 89, 255, 0.363);
     margin-top: 5px;
@@ -194,17 +196,18 @@
 /* --- BULK TRANSFER SPECIFIC STYLES --- */
 
 /* Textarea style for bulk numbers */
-#bulkRecipientNumbers {
+#bulkRecipientNumbers  {
     width: 100%;
-    padding: 15px;
-    border-radius: 8px;
+    height: 120px;
+    padding: 12px;
+    border-radius: 10px;
     border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(0,0,0,0.3);
-    color: white;
+    background: rgba(0,0,0,0.2);
+    color: #fff;
     font-size: 1rem;
     resize: vertical;
-    margin-bottom: 15px;
 }
+
 #bulkRecipientNumbers:focus {
     border-color: #00e0ff;
     box-shadow: 0 0 5px rgba(0,224,255,0.5);
@@ -217,14 +220,20 @@
 }
 
 /* Bulk History Button */
-.submit-btn.history-btn {
-    background: #000082; /* Darker/Grey background */
+.submit-btn.history-btn { 
+    background-color: #444466;
     color: #fff;
-    border: 1px solid #777;
-    margin-top: 15px; /* Space from Next button */
-    padding: 5px 12px;
-    border-radius: 5px;
+    width: 100%;
+    height: auto;
+    margin: auto;
+    border: 1px solid rgb(255, 255, 255);
+    font-weight: 700;
+    box-shadow: 0 0 5px rgba(100, 100, 255, 0.363);
+    margin-top: 5px;
+    padding: 10px 12px;
+    border-radius: 8px ;
 }
+
 .submit-btn.history-btn:hover {
     background: #555577;
 }
